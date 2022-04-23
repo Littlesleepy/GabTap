@@ -174,32 +174,8 @@ export default defineComponent({
 
     watch(
       () => playInit.value,
-      (newValue) => {
+      () => {
         clearInterval(AutoFalsh)
-        if (newValue) {
-          sprite.x = window.innerWidth / 2
-          sprite.y = window.innerHeight / 2 + 100
-          sprite.scale.set(0, 0)
-          sprite.anchor.x = 0.5
-          sprite.zIndex = 9
-          sprite.interactive = true
-          sprite.rotation = 3.14
-          app.stage.addChild(sprite)
-          let myObject = {
-            scale: 0
-          }
-          anime({
-            targets: myObject,
-            scale: 100,
-            duration: 1000,
-            update: function () {
-              upDateMask()
-            }
-          })
-          function upDateMask() {
-            sprite.scale.set(myObject.scale / 100, myObject.scale / 100)
-          }
-        }
       }
     )
     let date = 0
@@ -316,8 +292,7 @@ export default defineComponent({
               container.removeAllListeners()
               app.stage.removeChild(container)
             })
-            if (!color) return
-            setBackgroundColor()
+            if (i == 1) setBackgroundColor()
           }
         })
       }
@@ -383,7 +358,6 @@ export default defineComponent({
     }
     // 跟随点击音效音频跳动 ...
     const initHeader = (dataArray: Uint8Array, analyser: AnalyserNode) => {
-
       let myObject = {
         scale: 0
       }
@@ -408,7 +382,7 @@ export default defineComponent({
         }
         averageFrequencyData = sum / dataArray.length
         sprite.height = 500 + averageFrequencyData
-        sprite.skew.x = averageFrequencyData / 439
+        // sprite.skew.x = averageFrequencyData / 439
       }
     }
 
@@ -443,60 +417,57 @@ export default defineComponent({
       async function playSound(audioBuffer: AudioBuffer) {
         source.buffer = audioBuffer
         source.loop = true
-        // source.connect(gain)
         source.connect(gain)
         gain.connect(analyser)
         analyser.connect(ctx.destination)
-        // gain.connect(ctx.destination)
         source.start(0)
-        // let dataArray = new Uint8Array(analyser.frequencyBinCount)
-        // // 跟随背景音乐音频跳动 ...
-        // const initHeader = () => {
-        //   let myObject = {
-        //     scale: 0
-        //   }
-        //   sprite.x = window.innerWidth / 2
-        //   sprite.y = window.innerHeight / 2 + 100
-        //   sprite.scale.set(0, 0)
-        //   sprite.anchor.x = 0.5
-        //   sprite.zIndex = 9
-        //   sprite.interactive = true
-        //   sprite.rotation = 3.14
-        //   app.stage.addChild(sprite)
-        //   sprite.on('pointerdown', (e: PIXI.InteractionEvent) => {
-        //     console.log(1);
-
-        //   })
-        //   anime({
-        //     targets: myObject,
-        //     scale: 100,
-        //     duration: 1000,
-        //     update: function () {
-        //       upDateMask()
-        //     },
-        //     complete: () => {
-        //       app.ticker.add(() => {
-        //         upRener()
-        //       })
-        //     }
-        //   })
-        //   function upDateMask() {
-        //     sprite.scale.set(myObject.scale / 100, myObject.scale / 100)
-        //   }
-        //   let averageFrequencyData = 0
-        //   let sum = 0
-        //   function upRener() {
-        //     analyser.getByteFrequencyData(dataArray)
-        //     sum = 0
-        //     for (let i = 0; i < dataArray.length; i++) {
-        //       sum += dataArray[i]
-        //     }
-        //     averageFrequencyData = sum / dataArray.length
-        //     sprite.height = 500 + averageFrequencyData
-        //     sprite.skew.x = averageFrequencyData / 439
-        //   }
-        // }
-        // initHeader()
+        let dataArray = new Uint8Array(analyser.frequencyBinCount)
+        // 跟随背景音乐音频跳动 ...
+        const initHeader = () => {
+          let myObject = {
+            scale: 0
+          }
+          sprite.x = window.innerWidth / 2
+          sprite.y = window.innerHeight / 2 + 100
+          sprite.scale.set(0, 0)
+          sprite.anchor.x = 0.5
+          sprite.zIndex = 9
+          sprite.interactive = true
+          sprite.rotation = 3.14
+          app.stage.addChild(sprite)
+          sprite.on('pointerdown', (e: PIXI.InteractionEvent) => {
+            console.log('...')
+          })
+          anime({
+            targets: myObject,
+            scale: 100,
+            duration: 1000,
+            update: function () {
+              upDateMask()
+            },
+            complete: () => {
+              app.ticker.add(() => {
+                upRener()
+              })
+            }
+          })
+          function upDateMask() {
+            sprite.scale.set(myObject.scale / 100, myObject.scale / 100)
+          }
+          let averageFrequencyData = 0
+          let sum = 0
+          function upRener() {
+            analyser.getByteFrequencyData(dataArray)
+            sum = 0
+            for (let i = 0; i < dataArray.length; i++) {
+              sum += dataArray[i]
+            }
+            averageFrequencyData = sum / dataArray.length
+            sprite.skew.x = averageFrequencyData / 539
+            // sprite.height = 500 + averageFrequencyData
+          }
+        }
+        initHeader()
       }
     }
 
