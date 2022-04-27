@@ -9,7 +9,7 @@ import * as PIXI from 'pixi.js-legacy'
 import '@pixi/graphics-extras'
 import 'gsap'
 import 'pixi-sound'
-import { Rectangle,Rearrow } from '../hooks/animations'
+import { Rectangle, Rearrow } from '../hooks/animations'
 import anime from 'animejs/lib/anime.es.js'
 import { getRandom } from '../hooks/color'
 import axios from 'axios'
@@ -154,8 +154,8 @@ export default defineComponent({
         // 动画
         flashDraw(GabKeys[index])
         // 动画
-        // Rectangle(app)
-        Rearrow(app)
+        random(0, 1) < 0.5 ? Rectangle(app) : Rearrow(app)
+
         // 音频播放
         ThrottleSound(index, time)
 
@@ -429,7 +429,7 @@ export default defineComponent({
           let myObject = {
             scale: 0
           }
-          sprite.x = window.innerWidth -250
+          sprite.x = window.innerWidth - 250
           sprite.y = window.innerHeight
           sprite.scale.set(0, 0)
           sprite.anchor.x = 0.5

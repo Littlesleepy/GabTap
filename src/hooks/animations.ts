@@ -136,15 +136,21 @@ export const Rectangle = (app: PIXI.Application) => {
     mask.arc(0, 0, maskParams._radius, maskParams.startAngle, maskParams.endAngle, direction)
   }
 }
-// 箭头
-let RearrowNum = random(1, 1)
+// 箭头 什么垃圾代码
+let RearrowNum = random(1, 3)
 let ThisRearrowNum = 0
 export const Rearrow = (app: PIXI.Application) => {
   ThisRearrowNum++
-  let triangleNum = random(100, 400)
+  let triangleNum = random(200, 400)
   let triangleNumMax = triangleNum * 1.5
   let color = 0xffffff
   let reY = random(0, window.innerHeight)
+// 起始位置
+  let minX = window.innerWidth + triangleNumMax
+  // 结束位置
+  let maxX = -triangleNumMax*2
+  // 旋转一下捏
+  let rotations = 1.57
   // 精灵组
   let container: PIXI.Container = new PIXI.Container()
   let containers: PIXI.Container = new PIXI.Container()
@@ -153,9 +159,10 @@ export const Rearrow = (app: PIXI.Application) => {
   arrow.beginFill(getRandom(), 0)
   arrow.drawRect(0, 0, triangleNumMax, triangleNumMax)
   arrow.pivot.set(triangleNumMax / 2)
-  arrow.rotation = 4.71
+  arrow.rotation = rotations
   arrow.endFill()
   arrow.y = reY
+  arrow.x = minX
   // 三角形
   let triangle = new PIXI.Graphics()
   triangle.beginFill(color)
@@ -167,7 +174,6 @@ export const Rearrow = (app: PIXI.Application) => {
   container.addChild(triangle)
   // 矩形
   let tHNum = random(0.9, 2)
-  console.log(tHNum);
 
   let rectangle = new PIXI.Graphics()
   rectangle.beginFill(color)
@@ -183,21 +189,25 @@ export const Rearrow = (app: PIXI.Application) => {
   let panel = new PIXI.Graphics()
   panel.beginFill(pColor, 1)
   panel.drawRect(0, 0, triangleNumMax, triangleNumMax * (1 + tHNum))
-  panel.pivot.set(triangleNumMax / 2, triangleNumMax * (1 + tHNum)/2)
+  panel.pivot.set(triangleNumMax / 2, (triangleNumMax * (1 + tHNum)) / 2)
   panel.endFill()
-  panel.x = 0
+  panel.x = minX
   panel.y = reY
-  panel.rotation = 4.71
+  panel.rotation = rotations
   panel.mask = arrow
 
   containers.addChild(arrow)
   containers.addChild(panel)
-  // containers.rotation = 0.3925
+  // 方向控制 随机
+  containers.rotation = random(0,6.28)
+  containers.x=window.innerWidth/2
+  containers.y=window.innerHeight/2
+  containers.pivot.set(window.innerWidth/2,window.innerHeight/2)
   app.stage.addChild(containers)
 
   let containerCircle: PIXI.Container
-  // let CircleRandom= random(3.2, 4)
   const circles: PIXI.Graphics[] = []
+  // 圆点
   function setcircles() {
     let spacing = Math.sqrt(Math.pow(triangleNumMax / 2 / 7, 2) * 2)
     for (let c = 0; c < 7; c++) {
@@ -215,18 +225,21 @@ export const Rearrow = (app: PIXI.Application) => {
         containerCircle.addChild(circle)
         circles.push(circle)
       }
-      containerCircle.pivot.set((spacing * 2 * 6) / 2,spacing * 0.75)
+      containerCircle.pivot.set((spacing * 2 * 6) / 2, spacing * 0.75)
       containerCircle.x = triangleNumMax / 2 + (c * spacing) / 2
       containerCircle.rotation = 0.785
       panel.addChild(containerCircle)
     }
   }
   setcircles()
+  // 五角星
+
+  // 线条
 
   anime({
     targets: panel,
-    x: window.innerWidth * 1.5,
-    duration: 10000,
+    x: maxX,
+    duration: random(2000, 3000),
     easing: 'easeOutSine',
     update: function () {
       upDateMask()
@@ -256,10 +269,10 @@ export const Rearrow = (app: PIXI.Application) => {
   if (ThisRearrowNum < RearrowNum) {
     setTimeout(() => {
       Rearrow(app)
-    }, 39)
+    }, 69)
   } else {
     ThisRearrowNum = 0
-    RearrowNum = random(1, 1)
+    RearrowNum = random(1, 3)
   }
 }
 
