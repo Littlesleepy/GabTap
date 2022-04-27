@@ -9,7 +9,7 @@ import * as PIXI from 'pixi.js-legacy'
 import '@pixi/graphics-extras'
 import 'gsap'
 import 'pixi-sound'
-import { Rectangle } from '../hooks/animations'
+import { Rectangle,Rearrow } from '../hooks/animations'
 import anime from 'animejs/lib/anime.es.js'
 import { getRandom } from '../hooks/color'
 import axios from 'axios'
@@ -33,7 +33,8 @@ export default defineComponent({
     const childClick = () => {
       if (!ClickFlag) return
       throttle(50)
-      Rectangle(app)
+      // Rectangle(app)
+      // Rearrow(app)
     }
     let AutoFalsh: any
     let playInit = ref(false)
@@ -153,7 +154,8 @@ export default defineComponent({
         // 动画
         flashDraw(GabKeys[index])
         // 动画
-        Rectangle(app)
+        // Rectangle(app)
+        Rearrow(app)
         // 音频播放
         ThrottleSound(index, time)
 
@@ -394,7 +396,7 @@ export default defineComponent({
       let ctx = new AudioContext()
       let source = ctx.createBufferSource() // 创建音频源头节点
       let gain = ctx.createGain() //音量节点
-      gain.gain.value = 0.5
+      gain.gain.value = 0.1
       let analyser = ctx.createAnalyser()
       // analyser.fftSize = 256;
       // 播放
@@ -427,11 +429,11 @@ export default defineComponent({
           let myObject = {
             scale: 0
           }
-          sprite.x = window.innerWidth / 2
-          sprite.y = window.innerHeight / 2 + 100
+          sprite.x = window.innerWidth -250
+          sprite.y = window.innerHeight
           sprite.scale.set(0, 0)
           sprite.anchor.x = 0.5
-          sprite.zIndex = 9
+          sprite.zIndex = 8
           sprite.interactive = true
           sprite.rotation = 3.14
           app.stage.addChild(sprite)
