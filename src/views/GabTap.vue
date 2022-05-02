@@ -9,7 +9,7 @@ import * as PIXI from 'pixi.js-legacy'
 import '@pixi/graphics-extras'
 import 'gsap'
 import 'pixi-sound'
-import { Rectangle, Rearrow } from '../hooks/animations'
+import { Rectangle, Rearrow, RRearrow } from '../hooks/animations'
 import anime from 'animejs/lib/anime.es.js'
 import { getRandom } from '../hooks/color'
 import axios from 'axios'
@@ -56,8 +56,8 @@ export default defineComponent({
       initGabTap()
       setBackgroundColor()
       app.renderer.resize(document.body.offsetWidth, document.body.offsetHeight)
-      sprite.x = window.innerWidth / 2
-      sprite.y = window.innerHeight / 2 + 100
+      sprite.x = window.innerWidth - 250
+      sprite.y = window.innerHeight
     }
     onMounted(() => {
       initApp()
@@ -154,8 +154,9 @@ export default defineComponent({
         // 动画
         flashDraw(GabKeys[index])
         // 动画
-        random(0, 1) < 0.5 ? Rectangle(app) : Rearrow(app)
-
+        // random(0, 1) < 0.5 ? Rectangle(app) : Rearrow(app)
+        // Rearrow(app)
+        RRearrow(app)
         // 音频播放
         ThrottleSound(index, time)
 
@@ -214,6 +215,7 @@ export default defineComponent({
     // 背景动画
     let color: number = 0
     let reColor = -1
+    const backgroundAnimeArr: PIXI.Container[] = []
     const backgroundAnime = () => {
       // 精灵组
       let container: PIXI.Container = new PIXI.Container()
@@ -240,6 +242,7 @@ export default defineComponent({
       pane.addChild(mask)
       pane.addChild(polygon)
       container.addChild(pane)
+      backgroundAnimeArr.push(container)
       app.stage.addChild(container)
       // 储存多边形的各个点位置
       let Bpoints: PIXI.Point[] = [],
@@ -291,8 +294,10 @@ export default defineComponent({
           complete: function () {
             upDateMask(mask)
             nextTick(() => {
-              container.removeAllListeners()
-              app.stage.removeChild(container)
+              if (backgroundAnimeArr.length > 1) {
+                backgroundAnimeArr[0].removeAllListeners()
+                app.stage.removeChild(backgroundAnimeArr[0])
+              }
             })
             if (i == 1) setBackgroundColor()
           }

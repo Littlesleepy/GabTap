@@ -136,139 +136,154 @@ export const Rectangle = (app: PIXI.Application) => {
     mask.arc(0, 0, maskParams._radius, maskParams.startAngle, maskParams.endAngle, direction)
   }
 }
-// 箭头 什么垃圾代码
+
+// 箭头
 let RearrowNum = random(1, 3)
 let ThisRearrowNum = 0
-export const Rearrow = (app: PIXI.Application) => {
+export const RRearrow = (app: PIXI.Application) => {
   ThisRearrowNum++
-  let triangleNum = random(200, 400)
-  let triangleNumMax = triangleNum * 1.5
-  let color = 0xffffff
-  let reY = random(0, window.innerHeight)
-// 起始位置
-  let minX = window.innerWidth + triangleNumMax
-  // 结束位置
-  let maxX = -triangleNumMax*2
-  // 旋转一下捏
-  let rotations = 1.57
-  // 精灵组
-  let container: PIXI.Container = new PIXI.Container()
+  let Rcontainer: PIXI.Container = new PIXI.Container()
   let containers: PIXI.Container = new PIXI.Container()
-  // 箭头遮罩
-  let arrow = new PIXI.Graphics()
-  arrow.beginFill(getRandom(), 0)
-  arrow.drawRect(0, 0, triangleNumMax, triangleNumMax)
-  arrow.pivot.set(triangleNumMax / 2)
-  arrow.rotation = rotations
-  arrow.endFill()
-  arrow.y = reY
-  arrow.x = minX
-  // 三角形
-  let triangle = new PIXI.Graphics()
-  triangle.beginFill(color)
-  triangle.drawPolygon([0, 0, triangleNum, 0, triangleNum / 2, triangleNum / 2])
-  triangle.pivot.set(triangleNum / 2, 0)
-  triangle.endFill()
-  triangle.x = triangleNumMax / 2
-  triangle.y = triangleNum
-  container.addChild(triangle)
-  // 矩形
+  let MaskColor = 0xffffff
+  let Color = getRandom()
+  if (Color == 0) Color = 0x444444
+
+  // 宽度
+  let triangleNum = random(200, 400)
+  // 长度随机
   let tHNum = random(0.9, 2)
+  // 宽度的一半
+  let littriangleNum = triangleNum / 2
+  let triangleNumMax = triangleNum * tHNum + littriangleNum
 
+  // 遮罩层和底层大小一样
+  function setRectangle(color: number): PIXI.Graphics {
+    let graphics = new PIXI.Graphics()
+    graphics.beginFill(color, color ? 1 : 0)
+    graphics.drawRect(0, 0, triangleNum, triangleNumMax)
+    graphics.pivot.set(littriangleNum, triangleNumMax / 2)
+    graphics.endFill()
+    return graphics
+  }
+  // 遮罩层
+  let arrow = setRectangle(0x000000)
+
+  Rcontainer.addChild(arrow)
+  // // 三角形
+  let triangle = new PIXI.Graphics()
+  triangle.beginFill(MaskColor)
+  triangle.drawPolygon([0, 0, triangleNum, 0, littriangleNum, littriangleNum])
+  triangle.endFill()
+  triangle.y = triangleNum * tHNum
+  arrow.addChild(triangle)
+  // // 矩形
   let rectangle = new PIXI.Graphics()
-  rectangle.beginFill(color)
-  rectangle.drawRect(0, 0, triangleNum / 2, triangleNum * tHNum)
-  rectangle.pivot.set(triangleNum / 4, triangleNum * tHNum)
+  rectangle.beginFill(MaskColor)
+  rectangle.drawRect(0, 0, littriangleNum, triangleNum * tHNum)
   rectangle.endFill()
-  rectangle.x = triangleNumMax / 2
-  rectangle.y = triangleNum
-  container.addChild(rectangle)
-  arrow.addChild(container)
-  let pColor = getRandom()
-  // 被遮罩的图形
-  let panel = new PIXI.Graphics()
-  panel.beginFill(pColor, 1)
-  panel.drawRect(0, 0, triangleNumMax, triangleNumMax * (1 + tHNum))
-  panel.pivot.set(triangleNumMax / 2, (triangleNumMax * (1 + tHNum)) / 2)
-  panel.endFill()
-  panel.x = minX
-  panel.y = reY
-  panel.rotation = rotations
+  rectangle.x = triangleNum / 4
+  arrow.addChild(rectangle)
+
+  // 被遮罩的图形 底图
+  let panel = setRectangle(Color)
   panel.mask = arrow
+  Rcontainer.addChild(panel)
 
-  containers.addChild(arrow)
-  containers.addChild(panel)
-  // 方向控制 随机
-  containers.rotation = random(0,6.28)
-  containers.x=window.innerWidth/2
-  containers.y=window.innerHeight/2
-  containers.pivot.set(window.innerWidth/2,window.innerHeight/2)
-  app.stage.addChild(containers)
-
-  let containerCircle: PIXI.Container
-  const circles: PIXI.Graphics[] = []
+  // 给底图添加图形 反向遮罩/纯白
   // 圆点
+  let containerCircle = new PIXI.Container()
+  const circles: PIXI.Graphics[] = []
   function setcircles() {
-    let spacing = Math.sqrt(Math.pow(triangleNumMax / 2 / 7, 2) * 2)
-    for (let c = 0; c < 7; c++) {
+    let spacing = Math.sqrt(Math.pow(triangleNumMax / 20, 2) * 2)
+    let nums = Math.ceil((triangleNumMax * (1 + tHNum)) / (spacing * 5))
+    console.log(nums)
+    for (let i = 0; i < nums; i++) {
       containerCircle = new PIXI.Container()
-      containerCircle.y = spacing * random(3.2, 4) * c
-      for (let i = 1; i <= 6; i++) {
+      containerCircle.y = spacing * random(4, 4.8) * i - spacing * 3
+      for (let j = 0; j <= 6; j++) {
+        let r = random(10, spacing * 0.75)
         let circle = new PIXI.Graphics()
         circle.beginFill(0xffffff, 1)
-        circle.drawCircle(0, 0, random(10, spacing * 0.75))
+        circle.drawCircle(0, 0, r)
         circle.endFill()
-        circle.pivot.x = spacing * 0.75
-        circle.pivot.y = spacing * 0.75
-        circle.x = spacing * 2.5 * i
-        circle.y = triangleNum - spacing
+        circle.x = spacing * 2.5 * j
+        containerCircle.rotation = 0.785
+        containerCircle.pivot.set(containerCircle.width / 2, containerCircle.height / 2)
+        containerCircle.x = triangleNum / 2 - r + i * random(0, 20)
         containerCircle.addChild(circle)
+
+        panel.addChild(containerCircle)
+
         circles.push(circle)
       }
-      containerCircle.pivot.set((spacing * 2 * 6) / 2, spacing * 0.75)
-      containerCircle.x = triangleNumMax / 2 + (c * spacing) / 2
-      containerCircle.rotation = 0.785
-      panel.addChild(containerCircle)
     }
   }
-  setcircles()
   // 五角星
-
+  function stars() {}
   // 线条
+  function lines() {
+    let spacing = Math.sqrt(Math.pow(triangleNumMax / 20, 2) * 2)
+    let nums = Math.ceil((triangleNumMax * (1 + tHNum)) / (spacing * 3)) + 2
+    for (let i = 1; i <= nums; i++) {
+      let line = new PIXI.Graphics()
+      line.lineStyle(spacing / 4 + random(0, 5), 0xffffff, 1)
+      line.pivot.set((triangleNumMax * (1 + tHNum)) / 2, spacing / 2)
+      line.moveTo(0, 0)
+      line.lineTo(triangleNumMax * (1 + tHNum), 0)
+      line.x = (triangleNumMax * (1 + tHNum)) / 5
+      line.y = spacing * 3 * i - spacing * 3 * 2
+      line.rotation = 0.785
+      panel.addChild(line)
+      circles.push(line)
+    }
+  }
+  switch (Math.trunc(random(1, 5))) {
+    case 1:
+      setcircles()
+      break
+    case 2:
+      lines()
+      break
+    case 3:
+      stars()
+      break
+  }
 
+  Rcontainer.x = -triangleNumMax
+  Rcontainer.y = random(0, window.innerHeight)
+  Rcontainer.rotation = -1.57
+
+  containers.addChild(Rcontainer)
+  containers.x = window.innerWidth / 2
+  containers.y = window.innerHeight / 2
+  containers.pivot.set(window.innerWidth / 2, window.innerHeight / 2)
+  containers.rotation = 1.57 * Math.trunc(random(1, 5))
+  app.stage.addChild(containers)
+  // 动画
   anime({
-    targets: panel,
-    x: maxX,
+    targets: Rcontainer,
+    x: window.innerWidth + triangleNumMax,
     duration: random(2000, 3000),
     easing: 'easeOutSine',
-    update: function () {
-      upDateMask()
-    },
     complete: function () {
-      container.removeChild(triangle)
-      container.removeChild(rectangle)
-      container.removeChild(rectangle)
-      arrow.removeChild(container)
+      containers.removeAllListeners()
+      Rcontainer.removeAllListeners()
+      arrow.removeAllListeners()
       arrow.clear()
-      panel.removeChild(containerCircle)
+      panel.removeAllListeners()
       panel.clear()
       circles.forEach((circle) => {
         circle.clear()
-        containerCircle.removeChild(circle)
+        containerCircle.removeAllListeners()
         circles.pop()
       })
-      containers.removeChild(panel)
-      containers.removeChild(arrow)
       app.stage.removeChild(containers)
     }
   })
-  // 更新/重绘
-  function upDateMask() {
-    arrow.x = panel.x
-  }
+
   if (ThisRearrowNum < RearrowNum) {
     setTimeout(() => {
-      Rearrow(app)
+      RRearrow(app)
     }, 69)
   } else {
     ThisRearrowNum = 0
