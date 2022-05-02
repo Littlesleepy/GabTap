@@ -140,7 +140,7 @@ export const Rectangle = (app: PIXI.Application) => {
 // 箭头
 let RearrowNum = random(1, 3)
 let ThisRearrowNum = 0
-export const RRearrow = (app: PIXI.Application) => {
+export const Rearrow = (app: PIXI.Application) => {
   ThisRearrowNum++
   let Rcontainer: PIXI.Container = new PIXI.Container()
   let containers: PIXI.Container = new PIXI.Container()
@@ -151,7 +151,7 @@ export const RRearrow = (app: PIXI.Application) => {
   // 宽度
   let triangleNum = random(200, 400)
   // 长度随机
-  let tHNum = random(0.9, 2)
+  let tHNum = random(0.9, 4)
   // 宽度的一半
   let littriangleNum = triangleNum / 2
   let triangleNumMax = triangleNum * tHNum + littriangleNum
@@ -190,36 +190,47 @@ export const RRearrow = (app: PIXI.Application) => {
   Rcontainer.addChild(panel)
 
   // 给底图添加图形 反向遮罩/纯白
-  // 圆点
-  let containerCircle = new PIXI.Container()
+  // 圆点 五角星
+  // let containerCircle = new PIXI.Container()
+  // 图形数组
   const circles: PIXI.Graphics[] = []
   function setcircles() {
+    // 绘制圆点或者星星
+    const draw = random(0, 1) > 0.5 ? 'circle' : 'stars'
+    // 计算绘制图形行列
     let spacing = Math.sqrt(Math.pow(triangleNumMax / 20, 2) * 2)
     let nums = Math.ceil((triangleNumMax * (1 + tHNum)) / (spacing * 5))
-    console.log(nums)
+    // 循环绘制
     for (let i = 0; i < nums; i++) {
-      containerCircle = new PIXI.Container()
+      // 行
+      let containerCircle = new PIXI.Container()
       containerCircle.y = spacing * random(4, 4.8) * i - spacing * 3
       for (let j = 0; j <= 6; j++) {
-        let r = random(10, spacing * 0.75)
+        // 列
+        // 半径
+        let radius = random(10, spacing * 0.75)
         let circle = new PIXI.Graphics()
         circle.beginFill(0xffffff, 1)
-        circle.drawCircle(0, 0, r)
+        switch (draw) {
+          case 'circle':
+            circle.drawCircle(0, 0, radius)
+            break
+          case 'stars':
+            const Bpoints = setStars(radius, radius / 2)
+            circle.drawPolygon(Bpoints)
+            break
+        }
         circle.endFill()
         circle.x = spacing * 2.5 * j
-        containerCircle.rotation = 0.785
-        containerCircle.pivot.set(containerCircle.width / 2, containerCircle.height / 2)
-        containerCircle.x = triangleNum / 2 - r + i * random(0, 20)
         containerCircle.addChild(circle)
-
-        panel.addChild(containerCircle)
-
         circles.push(circle)
       }
+      containerCircle.rotation = 0.785
+      containerCircle.pivot.set(containerCircle.width / 2, containerCircle.height / 2)
+      containerCircle.x = triangleNum / 2 + i * random(0, 20)
+      panel.addChild(containerCircle)
     }
   }
-  // 五角星
-  function stars() {}
   // 线条
   function lines() {
     let spacing = Math.sqrt(Math.pow(triangleNumMax / 20, 2) * 2)
@@ -245,14 +256,13 @@ export const RRearrow = (app: PIXI.Application) => {
       lines()
       break
     case 3:
-      stars()
+      setcircles()
       break
   }
 
   Rcontainer.x = -triangleNumMax
   Rcontainer.y = random(0, window.innerHeight)
   Rcontainer.rotation = -1.57
-
   containers.addChild(Rcontainer)
   containers.x = window.innerWidth / 2
   containers.y = window.innerHeight / 2
@@ -272,9 +282,10 @@ export const RRearrow = (app: PIXI.Application) => {
       arrow.clear()
       panel.removeAllListeners()
       panel.clear()
+      // containerCircle.removeAllListeners()
       circles.forEach((circle) => {
         circle.clear()
-        containerCircle.removeAllListeners()
+        circle.removeChild()
         circles.pop()
       })
       app.stage.removeChild(containers)
@@ -283,12 +294,32 @@ export const RRearrow = (app: PIXI.Application) => {
 
   if (ThisRearrowNum < RearrowNum) {
     setTimeout(() => {
-      RRearrow(app)
+      Rearrow(app)
     }, 69)
   } else {
     ThisRearrowNum = 0
     RearrowNum = random(1, 3)
   }
+}
+
+// 生成五角星
+export const setStars = (R: number, r: number) => {
+  // 弧度
+  const getAngle = (angle: number) => (Math.PI / 180) * angle
+  const cos = (angle: number) => Math.cos(getAngle(angle))
+  const sin = (angle: number) => Math.sin(getAngle(angle))
+  // 路径
+  const Bpoints: PIXI.Point[] = []
+  function getStarPath(R: number, r: number) {
+    const horn = 5
+    const angle = 360 / horn
+    for (let i = 0; i < horn; i++) {
+      Bpoints.push(new PIXI.Point(R * cos(18 + i * angle), -R * sin(18 + i * angle)))
+      Bpoints.push(new PIXI.Point(r * cos(54 + i * angle), -r * sin(54 + i * angle)))
+    }
+  }
+  getStarPath(R, r)
+  return Bpoints
 }
 
 // 生成随机多边形 3~9
