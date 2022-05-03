@@ -302,8 +302,93 @@ export const Rearrow = (app: PIXI.Application) => {
   }
 }
 
+// 圆环
+export const Rcircle = (app: PIXI.Application) => {
+  const containers: PIXI.Container = new PIXI.Container()
+  const Color = getRandom()
+  const ran = random(1, 2)
+  const SR = 22.5 * ran
+  const LSR = SR / 2
+  const R = 600 * ran
+  const rectAndHole = new PIXI.Graphics()
+  rectAndHole.beginFill(Color)
+  rectAndHole.drawRect(0, 0, R, R)
+  rectAndHole.beginHole()
+  const nums = Math.trunc(R / SR) / 4
+  const Arr: any[] = [[]]
+  for (let i = 1; i <= nums; i++) {
+    Arr[i] = []
+    for (let j = 0; j < nums; j++) {
+      const sp = random(3.8, 4)
+      const r = random(0, 360)
+      const ISR = random(SR / 3, SR)
+      const ILSR = ISR / 2
+      const Bpoints = setStars(ISR, ILSR, SR * sp * j, SR * 4 * i, r)
+      rectAndHole.drawPolygon(Bpoints)
+      Arr[i][j] = { sp, r, ISR }
+    }
+  }
+  rectAndHole.endHole()
+  rectAndHole.endFill()
+
+  let circle = new PIXI.Graphics()
+  circle.lineStyle((R / 4) * random(0.65, 0.85), 0xff3300, 1)
+  circle.beginFill(0x9966ff, 0)
+  circle.drawCircle(0, 0, (R / 2 - R / 8) * 0.8)
+  circle.endFill()
+  circle.x = R / 2
+  circle.y = R / 2
+  rectAndHole.mask = circle
+  rectAndHole.addChild(circle)
+  rectAndHole.pivot.set(R / 2, R / 2)
+  rectAndHole.rotation = 0
+  containers.addChild(rectAndHole)
+  containers.x = window.innerWidth
+  containers.y = window.innerHeight
+  app.stage.addChild(containers)
+  anime({
+    targets: containers,
+    alpha: 0,
+    duration: 0
+  })
+  // 动画
+  anime({
+    targets: containers,
+    keyframes: [
+      { x: window.innerWidth / 2, y: window.innerHeight / 2, alpha: 1, rotation: 0.785 },
+      { x: 0, y: 0, alpha: 0, rotation: 1.57 }
+    ],
+    duration: 1600,
+    easing: 'easeInOutQuad',
+    update: function () {
+      rectAndHole.scale.set(rectAndHole.alpha / 2 + 1)
+      rectAndHole.clear()
+      rectAndHole.beginFill(Color)
+      rectAndHole.drawRect(0, 0, R, R)
+      rectAndHole.beginHole()
+      for (let i = 1; i <= nums; i++) {
+        for (let j = 0; j < nums; j++) {
+          const ISR = Arr[i][j].ISR
+          const ILSR = ISR / 2
+          const Bpoints = setStars(ISR, ILSR, SR * Arr[i][j].sp * j, SR * 4 * i, Arr[i][j].r++)
+          rectAndHole.drawPolygon(Bpoints)
+        }
+      }
+      rectAndHole.endHole()
+      rectAndHole.endFill()
+    },
+    complete: function () {
+      circle.clear()
+      circle.removeChild()
+      rectAndHole.removeChild(circle)
+      containers.removeAllListeners()
+      app.stage.removeChild(containers)
+    }
+  })
+}
+
 // 生成五角星
-export const setStars = (R: number, r: number) => {
+export const setStars = (R: number, r: number, x: number = 0, y: number = 0, ang: number = 0) => {
   // 弧度
   const getAngle = (angle: number) => (Math.PI / 180) * angle
   const cos = (angle: number) => Math.cos(getAngle(angle))
@@ -314,8 +399,12 @@ export const setStars = (R: number, r: number) => {
     const horn = 5
     const angle = 360 / horn
     for (let i = 0; i < horn; i++) {
-      Bpoints.push(new PIXI.Point(R * cos(18 + i * angle), -R * sin(18 + i * angle)))
-      Bpoints.push(new PIXI.Point(r * cos(54 + i * angle), -r * sin(54 + i * angle)))
+      Bpoints.push(
+        new PIXI.Point(R * cos(18 + ang + i * angle) + x, -R * sin(18 + ang + i * angle) + y)
+      )
+      Bpoints.push(
+        new PIXI.Point(r * cos(54 + ang + i * angle) + x, -r * sin(54 + ang + i * angle) + y)
+      )
     }
   }
   getStarPath(R, r)
