@@ -5,8 +5,10 @@ import 'gsap'
 import { maskParams } from './animationType'
 import { random } from './random'
 import { getRandom } from './color'
+import { easingPlus } from './easing'
 import GM1PNG from '../assets/images/GM02.png'
 import anime from 'animejs/lib/anime.es.js'
+import { nextTick } from 'vue'
 // 多边形
 export const Rectangle = (app: PIXI.Application) => {
   // 图形
@@ -316,21 +318,81 @@ export const Rcircle = (app: PIXI.Application) => {
   rectAndHole.beginHole()
   const nums = Math.trunc(R / SR) / 4
   const Arr: any[] = [[]]
-  for (let i = 1; i <= nums; i++) {
-    Arr[i] = []
-    for (let j = 0; j < nums; j++) {
-      const sp = random(3.8, 4)
-      const r = random(0, 360)
-      const ISR = random(SR / 3, SR)
-      const ILSR = ISR / 2
-      const Bpoints = setStars(ISR, ILSR, SR * sp * j, SR * 4 * i, r)
-      rectAndHole.drawPolygon(Bpoints)
-      Arr[i][j] = { sp, r, ISR }
+  let AR = {
+    ...Arr
+  }
+  // 镂空
+  function Rstars() {
+    for (let i = 1; i <= nums; i++) {
+      Arr[i] = []
+      for (let j = 0; j < nums; j++) {
+        const sp = random(3.8, 4)
+        const r = random(0, 360)
+        const ISR = random(SR / 3, SR)
+        const ILSR = ISR / 2
+        const Bpoints = setStars(ISR, ILSR, SR * sp * j, SR * 4 * i, r)
+        rectAndHole.drawPolygon(Bpoints)
+        Arr[i][j] = { sp, r, ISR }
+      }
     }
+  }
+  let myObject
+  function Rcircle() {
+    for (let i = 1; i <= nums; i++) {
+      Arr[i] = []
+      for (let j = 0; j < nums; j++) {
+        const sp = random(3.8, 4)
+        const ISR = random(SR / 2, SR)
+        rectAndHole.drawCircle(SR * sp * j, SR * 4 * i, ISR)
+        Arr[i][j] = { ISR, sp }
+      }
+      AR[i] = { ...Arr[i] }
+    }
+    // 性能炸弹
+    // for (let i = 1; i <= nums; i++) {
+    //   for (let j = 0; j < nums; j++) {
+    //     anime({
+    //       targets: AR[i][j],
+    //       keyframes: [{ ISR: 0 , duration: 0},{ ISR: Arr[i][j].ISR }, { ISR: Arr[i][j].ISR }],
+    //       duration: 1600,
+    //       easing: easingPlus()
+    //     })
+    //   }
+    // }
+  }
+
+  const lineNums = Math.trunc(R / SR / 3)
+  const NR = Math.trunc(random(0, lineNums))
+  function Rline() {
+    for (let i = 0; i <= lineNums; i++) {
+      rectAndHole.drawRect(0, SR * 3 * i, R, SR)
+      Arr[i] = R
+      AR[i] = Arr[i]
+      if (i !== NR) {
+        anime({
+          targets: AR,
+          keyframes: [{ [i]: R / 2 }, { [i]: 0 }],
+          duration: 1600,
+          easing: easingPlus()
+        })
+      }
+    }
+  }
+  const funs = Math.trunc(random(1, 4))
+  switch (funs) {
+    case 1:
+      Rcircle()
+      break
+    case 2:
+      Rstars()
+      break
+    case 3:
+      Rline()
+      break
   }
   rectAndHole.endHole()
   rectAndHole.endFill()
-
+  // 遮罩
   let circle = new PIXI.Graphics()
   circle.lineStyle((R / 4) * random(0.65, 0.85), 0xff3300, 1)
   circle.beginFill(0x9966ff, 0)
@@ -351,39 +413,69 @@ export const Rcircle = (app: PIXI.Application) => {
     alpha: 0,
     duration: 0
   })
-  // 动画
-  anime({
-    targets: containers,
-    keyframes: [
-      { x: window.innerWidth / 2, y: window.innerHeight / 2, alpha: 1, rotation: 0.785 },
-      { x: 0, y: 0, alpha: 0, rotation: 1.57 }
-    ],
-    duration: 1600,
-    easing: 'easeInOutQuad',
-    update: function () {
-      rectAndHole.scale.set(rectAndHole.alpha / 2 + 1)
-      rectAndHole.clear()
-      rectAndHole.beginFill(Color)
-      rectAndHole.drawRect(0, 0, R, R)
-      rectAndHole.beginHole()
-      for (let i = 1; i <= nums; i++) {
-        for (let j = 0; j < nums; j++) {
-          const ISR = Arr[i][j].ISR
-          const ILSR = ISR / 2
-          const Bpoints = setStars(ISR, ILSR, SR * Arr[i][j].sp * j, SR * 4 * i, Arr[i][j].r++)
-          rectAndHole.drawPolygon(Bpoints)
+
+  nextTick(() => {
+    // 动画
+    anime({
+      targets: containers,
+      keyframes: [
+        { x: window.innerWidth / 2, y: window.innerHeight / 2, alpha: 1, rotation: 0.785 },
+        { x: 0, y: 0, alpha: 0, rotation: 1.57 }
+      ],
+      duration: 1600,
+      easing: 'easeInOutQuad',
+      update: function () {
+        rectAndHole.scale.set(rectAndHole.alpha / 2 + 1)
+        if (funs == 1) return
+        rectAndHole.clear()
+        rectAndHole.removeChild()
+        rectAndHole.beginFill(Color)
+        rectAndHole.drawRect(0, 0, R, R)
+        rectAndHole.beginHole()
+        switch (funs) {
+          case 1:
+            // 性能炸弹
+            // for (let i = 1; i <= nums; i++) {
+            //   for (let j = 0; j < nums; j++) {
+            //     const ISR = Arr[i][j].ISR
+            //     const ILSR = ISR / 2
+            //     rectAndHole.drawCircle(SR * Arr[i][j].sp * j, SR * 4 * i, AR[i][j].ISR)
+            //   }
+            // }
+            break
+          case 2:
+            for (let i = 1; i <= nums; i++) {
+              for (let j = 0; j < nums; j++) {
+                const ISR = Arr[i][j].ISR
+                const ILSR = ISR / 2
+                const Bpoints = setStars(
+                  ISR,
+                  ILSR,
+                  SR * Arr[i][j].sp * j,
+                  SR * 4 * i,
+                  Arr[i][j].r++
+                )
+                rectAndHole.drawPolygon(Bpoints)
+              }
+            }
+            break
+          case 3:
+            for (let i = 0; i <= Math.trunc(R / SR / 3); i++) {
+              rectAndHole.drawRect(0, SR * 3 * i, AR[i], SR)
+            }
+            break
         }
+        rectAndHole.endHole()
+        rectAndHole.endFill()
+      },
+      complete: function () {
+        circle.clear()
+        circle.removeChild()
+        rectAndHole.removeChild(circle)
+        containers.removeAllListeners()
+        app.stage.removeChild(containers)
       }
-      rectAndHole.endHole()
-      rectAndHole.endFill()
-    },
-    complete: function () {
-      circle.clear()
-      circle.removeChild()
-      rectAndHole.removeChild(circle)
-      containers.removeAllListeners()
-      app.stage.removeChild(containers)
-    }
+    })
   })
 }
 

@@ -155,8 +155,9 @@ export default defineComponent({
         flashDraw(GabKeys[index])
         // 动画
         // random(0, 1) < 0.5 ? Rectangle(app) : Rearrow(app)
-        Rcircle(app)
-
+        // Rcircle(app)
+        const funArr = [Rearrow, Rectangle, Rcircle]
+        funArr[index % funArr.length](app)
         // 音频播放
         ThrottleSound(index, time)
 
@@ -173,7 +174,6 @@ export default defineComponent({
       AutoFalsh = setInterval(() => {
         flashDraw(GabKeys[Math.trunc(random(31, 0))])
       }, 2000)
-
     }
 
     watch(
