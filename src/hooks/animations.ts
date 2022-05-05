@@ -40,7 +40,7 @@ export const Rectangle = (app: PIXI.Application) => {
   // 几边形
   let num = Math.floor(random(3, 10))
   // 线宽
-  let lineWidth = random(4, 10)
+  let lineWidth = random(4, 10)*radVNums()
   // 颜色
   let color = getRandom()
   let X = random(radius, window.innerWidth - radius)
@@ -67,12 +67,14 @@ export const Rectangle = (app: PIXI.Application) => {
   sprite.anchor.set(0.5, 0.5)
   sprite.position.x = X
   sprite.position.y = Y
+  // sprite.scale.set(radVNums())
   // 变形
   polygon.pivot.x = X
   polygon.pivot.y = Y
   pol.pivot.x = X
   pol.pivot.y = Y
   // 遮罩层
+
   pol.lineStyle(lineWidth, color)
   pol.beginFill(color)
   pol.drawPolygon(points)
@@ -128,10 +130,10 @@ export const Rectangle = (app: PIXI.Application) => {
   })
   // 更新/重绘
   function upDateMask(mask: PIXI.Graphics, direction: boolean) {
-    mask.scale.set(myObject.scale / 100, myObject.scale / 100)
-    pol.scale.set(myObject.scale / 100, myObject.scale / 100)
-    polygon.scale.set(myObject.scale / 100, myObject.scale / 100)
-    sprite.scale.set(myObject.scale / 250, myObject.scale / 250)
+    mask.scale.set(myObject.scale / 100)
+    pol.scale.set(myObject.scale / 100)
+    polygon.scale.set(myObject.scale / 100)
+    sprite.scale.set(myObject.scale / 250*radVNums())
     mask.clear()
     mask.beginFill(0x00ffff)
     mask.moveTo(0, 0)
@@ -149,9 +151,10 @@ export const Rearrow = (app: PIXI.Application) => {
   let MaskColor = 0xffffff
   let Color = getRandom()
   if (Color == 0) Color = 0x444444
+  const tsr = Math.sqrt(Math.pow(window.innerHeight, 2) + Math.pow(window.innerWidth, 2)) / 10.5
 
   // 宽度
-  let triangleNum = random(200, 400)
+  let triangleNum = random(tsr, tsr * 2)
   // 长度随机
   let tHNum = random(0.9, 4)
   // 宽度的一半
@@ -309,9 +312,12 @@ export const Rcircle = (app: PIXI.Application) => {
   const containers: PIXI.Container = new PIXI.Container()
   const Color = getRandom()
   const ran = random(1, 2)
-  const SR = 22.5 * ran
+  const tsr = Math.sqrt(Math.pow(window.innerHeight, 2) + Math.pow(window.innerWidth, 2)) / 94
+  const tr = Math.sqrt(Math.pow(window.innerHeight, 2) + Math.pow(window.innerWidth, 2)) / 3.5
+
+  const SR = tsr * ran
   const LSR = SR / 2
-  const R = 600 * ran
+  const R = tr * ran
   const rectAndHole = new PIXI.Graphics()
   rectAndHole.beginFill(Color)
   rectAndHole.drawRect(0, 0, R, R)
@@ -518,4 +524,8 @@ export function generatePolygonPoints(
     points.push(new PIXI.Point(x, y))
   }
   return points
+}
+// 视口对角线 标准为1080*1920 (1)
+ function radVNums():number {
+  return Math.sqrt(Math.pow(window.innerHeight, 2) + Math.pow(window.innerWidth, 2)) / 2136
 }

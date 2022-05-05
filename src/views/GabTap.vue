@@ -3,7 +3,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, onMounted, ref, watch, nextTick } from 'vue'
+import { defineComponent, onMounted, ref, watch, nextTick, computed } from 'vue'
 // import * as PIXI from 'pixi.js'
 import * as PIXI from 'pixi.js-legacy'
 import '@pixi/graphics-extras'
@@ -56,8 +56,10 @@ export default defineComponent({
       initGabTap()
       setBackgroundColor()
       app.renderer.resize(document.body.offsetWidth, document.body.offsetHeight)
-      sprite.x = window.innerWidth - 250
+      sprite.x = window.innerWidth - 250*radNums()
       sprite.y = window.innerHeight
+
+      sprite.scale.set(radNums())
     }
     onMounted(() => {
       initApp()
@@ -79,6 +81,7 @@ export default defineComponent({
       app.stage.sortableChildren = true
       document.body.appendChild(app.view)
       sprite = PIXI.Sprite.from(testPng)
+
       initGabTap()
     }
     let currentTarget = 0
@@ -323,6 +326,8 @@ export default defineComponent({
       var ctx = new AudioContext()
       let source = ctx.createBufferSource()
       let analyser = ctx.createAnalyser()
+      let gain = ctx.createGain() //音量节点
+      gain.gain.value = 1
       // 播放
       async function playAudio() {
         const audioBuffer = await loadAudio()
@@ -346,7 +351,9 @@ export default defineComponent({
         //循环播放
         source.loop = false
         // 音频连接到ctx
-        source.connect(analyser)
+        source.connect(gain)
+        gain.connect(analyser)
+
         analyser.connect(ctx.destination)
         // push到数组方便在外面控制
         // sources.push(source)
@@ -390,20 +397,23 @@ export default defineComponent({
           sum += dataArray[i]
         }
         averageFrequencyData = sum / dataArray.length
-        sprite.height = 500 + averageFrequencyData
+        sprite.height = (500 + averageFrequencyData) * radNums()
         // sprite.skew.x = averageFrequencyData / 439
       }
     }
 
     // ??? 背景音乐
     let flag = true
+    function radNums(){
+       return Math.sqrt(Math.pow(window.innerHeight, 2) + Math.pow(window.innerWidth, 2)) / 2136
+    }
     const PlayBgm = (bgm: any) => {
       if (!flag) return
       flag = false
       let ctx = new AudioContext()
       let source = ctx.createBufferSource() // 创建音频源头节点
       let gain = ctx.createGain() //音量节点
-      gain.gain.value = 0.1
+      gain.gain.value = 0.5
       let analyser = ctx.createAnalyser()
       // analyser.fftSize = 256;
       // 播放
@@ -436,7 +446,7 @@ export default defineComponent({
           let myObject = {
             scale: 0
           }
-          sprite.x = window.innerWidth - 250
+          sprite.x = window.innerWidth - 235 * radNums()
           sprite.y = window.innerHeight
           sprite.scale.set(0, 0)
           sprite.anchor.x = 0.5
@@ -449,7 +459,7 @@ export default defineComponent({
           })
           anime({
             targets: myObject,
-            scale: 100,
+            scale: radNums(),
             duration: 1000,
             update: function () {
               upDateMask()
@@ -461,7 +471,7 @@ export default defineComponent({
             }
           })
           function upDateMask() {
-            sprite.scale.set(myObject.scale / 100, myObject.scale / 100)
+            sprite.scale.set(myObject.scale, myObject.scale)
           }
           let averageFrequencyData = 0
           let sum = 0
@@ -472,7 +482,7 @@ export default defineComponent({
               sum += dataArray[i]
             }
             averageFrequencyData = sum / dataArray.length
-            sprite.skew.x = averageFrequencyData / 539
+            sprite.skew.x = (averageFrequencyData / 539) * radNums()
             // sprite.height = 500 + averageFrequencyData
           }
         }

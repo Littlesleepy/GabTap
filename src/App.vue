@@ -77,7 +77,7 @@ canvas {
   z-index: 9;
   align-items: center;
   // background-color: rgb(245, 161, 202);
-  // background-color: rgb(0, 180, 163);
+  background-color: rgb(0, 180, 163);
 }
 .FEEDBACK {
   font-family: fontFamilyName;
