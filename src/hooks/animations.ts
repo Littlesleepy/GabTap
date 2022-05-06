@@ -7,6 +7,7 @@ import { random } from './random'
 import { getRandom } from './color'
 import { easingPlus } from './easing'
 import GM1PNG from '../assets/images/GM02.png'
+import Feathers from '../assets/images/feather3.png'
 import anime from 'animejs/lib/anime.es.js'
 import { nextTick } from 'vue'
 // 多边形
@@ -40,7 +41,7 @@ export const Rectangle = (app: PIXI.Application) => {
   // 几边形
   let num = Math.floor(random(3, 10))
   // 线宽
-  let lineWidth = random(4, 10)*radVNums()
+  let lineWidth = random(4, 10) * radVNums()
   // 颜色
   let color = getRandom()
   let X = random(radius, window.innerWidth - radius)
@@ -133,7 +134,7 @@ export const Rectangle = (app: PIXI.Application) => {
     mask.scale.set(myObject.scale / 100)
     pol.scale.set(myObject.scale / 100)
     polygon.scale.set(myObject.scale / 100)
-    sprite.scale.set(myObject.scale / 250*radVNums())
+    sprite.scale.set((myObject.scale / 250) * radVNums())
     mask.clear()
     mask.beginFill(0x00ffff)
     mask.moveTo(0, 0)
@@ -485,6 +486,59 @@ export const Rcircle = (app: PIXI.Application) => {
   })
 }
 
+export const Rfeather = (app: PIXI.Application) => {
+  let seed = Math.floor(Math.random() * 3) + 13
+  let nums = seed
+  let width = window.innerWidth * 1.5 * radVNums()
+  let height = 50 * radVNums()
+  for (let i = 0; i < nums; i++) {
+    let n = random(6, nums)
+    const shape = new PIXI.Graphics()
+    shape.beginFill(getRandom(), 0)
+    shape.drawRect(-width / 2, -2 * height + height * 2 * n, 50, height)
+    shape.x = window.innerWidth
+    shape.y = window.innerHeight * 0.6
+    const feather = PIXI.Sprite.from(Feathers)
+    feather.x = -width / 2
+    feather.y = -2 * height + height * 2 * n
+    feather.scale.set(0.5 * radVNums())
+
+    shape.addChild(feather)
+    app.stage.addChild(shape)
+
+    anime({
+      targets: shape,
+      width: 0,
+      height: 0,
+      rotation: (Math.random() - 0.5) * 2 * Math.PI,
+      duration: 0,
+      easing: 'easeInOutQuad',
+      delay: random(20, 60) * i,
+      complete: function () {
+        anime({
+          targets: shape,
+          width: feather.width,
+          height: feather.height,
+          rotation: (Math.random() - 0.5) * 2 * Math.PI,
+          duration: 2000,
+          easing: 'easeInOutQuad'
+        })
+        anime({
+          targets: shape,
+          alpha: 0,
+          easing: 'easeInOutQuad',
+          delay: random(20, 60) * i + 800,
+          onComplete: function () {
+            feather.removeChild()
+            shape.clear()
+            app.stage.removeChild(shape)
+          }
+        })
+      }
+    })
+  }
+}
+
 // 生成五角星
 export const setStars = (R: number, r: number, x: number = 0, y: number = 0, ang: number = 0) => {
   // 弧度
@@ -526,6 +580,6 @@ export function generatePolygonPoints(
   return points
 }
 // 视口对角线 标准为1080*1920 (1)
- function radVNums():number {
+function radVNums(): number {
   return Math.sqrt(Math.pow(window.innerHeight, 2) + Math.pow(window.innerWidth, 2)) / 2136
 }

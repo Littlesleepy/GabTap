@@ -9,7 +9,7 @@ import * as PIXI from 'pixi.js-legacy'
 import '@pixi/graphics-extras'
 import 'gsap'
 import 'pixi-sound'
-import { Rectangle, Rearrow, Rcircle } from '../hooks/animations'
+import { Rectangle, Rearrow, Rcircle, Rfeather } from '../hooks/animations'
 import anime from 'animejs/lib/anime.es.js'
 import { getRandom } from '../hooks/color'
 import axios from 'axios'
@@ -56,7 +56,7 @@ export default defineComponent({
       initGabTap()
       setBackgroundColor()
       app.renderer.resize(document.body.offsetWidth, document.body.offsetHeight)
-      sprite.x = window.innerWidth - 250*radNums()
+      sprite.x = window.innerWidth - 250 * radNums()
       sprite.y = window.innerHeight
 
       sprite.scale.set(radNums())
@@ -159,7 +159,7 @@ export default defineComponent({
         // 动画
         // random(0, 1) < 0.5 ? Rectangle(app) : Rearrow(app)
         // Rcircle(app)
-        const funArr = [Rearrow, Rectangle, Rcircle]
+        const funArr = [Rearrow, Rectangle, Rcircle, Rfeather]
         funArr[index % funArr.length](app)
         // 音频播放
         ThrottleSound(index, time)
@@ -404,8 +404,8 @@ export default defineComponent({
 
     // ??? 背景音乐
     let flag = true
-    function radNums(){
-       return Math.sqrt(Math.pow(window.innerHeight, 2) + Math.pow(window.innerWidth, 2)) / 2136
+    function radNums() {
+      return Math.sqrt(Math.pow(window.innerHeight, 2) + Math.pow(window.innerWidth, 2)) / 2136
     }
     const PlayBgm = (bgm: any) => {
       if (!flag) return
