@@ -526,8 +526,8 @@ export const Rfeather = (app: PIXI.Application) => {
           targets: shape,
           alpha: 0,
           easing: 'easeInOutQuad',
-          delay: random(10, 30) * i + 500,
-          onComplete: function () {
+          delay: random(10, 30) * i + 300,
+          complete: function () {
             feather.removeChild()
             shape.clear()
             app.stage.removeChild(shape)
@@ -537,12 +537,13 @@ export const Rfeather = (app: PIXI.Application) => {
     })
   }
 }
+// 贝塞尔五角星放大
 let Rrotate = 0
 export const RsStars = (app: PIXI.Application) => {
   const Color = getRandom()
-  const myArr = []
+  const myArr: Array<PIXI.Graphics> = []
   const containers: PIXI.Container = new PIXI.Container()
-  function riStars(R: number, num: number,  alpha?: number) {
+  function riStars(R: number, num: number, alpha?: number) {
     const Bpoints = generatePolygonPoints(R, 5, 0, 0)
     const LitBpoints = generatePolygonPoints(R * num, 5, 0, 0)
     const bezier = new PIXI.Graphics()
@@ -558,7 +559,7 @@ export const RsStars = (app: PIXI.Application) => {
     containers.addChild(bezier)
     myArr.push(bezier)
   }
-  riStars(360 * radVNums(), 0.6 )
+  riStars(360 * radVNums(), 0.6)
   riStars(400 * radVNums(), 0.95)
   riStars(360 * 1.175 * radVNums(), 0.6, 0.2)
   riStars(400 * 1.175 * radVNums(), 0.95, 0.2)
@@ -575,16 +576,77 @@ export const RsStars = (app: PIXI.Application) => {
     duration: 800,
     easing: 'easeInQuart',
     complete: () => {
+      myArr[0].removeChild()
+      myArr[1].removeChild()
       containers.removeAllListeners()
       app.stage.removeChild(containers)
     }
   })
 }
-// 生成贝塞尔五角星
+// 随机生成贝塞尔五角星
+export const RsDomStars = (app: PIXI.Application) => {
+  for (let i = 0; i < random(6, 12); i++) {
+    const Color = getRandom()
+    const R = random(0.5, 1)
+    const myArr: Array<PIXI.Graphics> = []
+    const containers: PIXI.Container = new PIXI.Container()
+    const scale = random(0.75, 2)
+    const ran = random(0, 1)
+    const flag = ran < 0.5 ? true : false
+    function riStars(R: number, num: number) {
+      const Bpoints = generatePolygonPoints(R, 5, 0, 0)
+      const LitBpoints = flag ? generatePolygonPoints(R * num, 5, 0, 0) : undefined
+      const bezier = new PIXI.Graphics()
+      bezier.beginFill(Color, 1)
+      bezier.lineStyle(0, Color, 1)
+      bezier.moveTo(Bpoints[0].x, Bpoints[0].y)
+      // 绘制
+      bezierStars(bezier, Bpoints, LitBpoints)
+      bezier.endFill()
+
+      containers.addChild(bezier)
+      myArr.push(bezier)
+    }
+    let SNum = flag ? 300 : 100
+    riStars(SNum * 0.9 * R * radVNums(), 0.6)
+    riStars(SNum * R * radVNums(), 0.95)
+    app.stage.addChild(containers)
+    containers.position.x = random(0, window.innerWidth)
+    containers.position.y = random(0, window.innerHeight)
+    containers.scale.set(0)
+    containers.rotation = random(0, 6.28)
+    anime({
+      targets: containers.scale,
+      keyframes: [
+        {
+          x: scale * 0.25,
+          y: scale * 0.25,
+          duration: 800,
+          delay: 60 * i
+        },
+        {
+          x: 0,
+          y: 0,
+          duration: 600,
+          delay: 60 * i,
+          easing: 'easeInBack'
+        }
+      ],
+      complete: function () {
+        myArr[0].removeChild()
+        myArr[1].removeChild()
+        containers.removeAllListeners()
+        app.stage.removeChild(containers)
+      }
+    })
+  }
+}
+
+// 生成贝塞尔五角星 数位板
 const bezierStars = (
   bezier: PIXI.Graphics,
   Bpoints: Array<PIXI.Point>,
-  LitBpoints: Array<PIXI.Point>
+  LitBpoints?: Array<PIXI.Point>
 ) => {
   for (let i = 0; i < 5; i++) {
     let j = i + 1
@@ -593,25 +655,33 @@ const bezierStars = (
     let bs = (Bpoints[i].y + Bpoints[j].y) * 1.5
     bezier.bezierCurveTo(Bpoints[i].x, Bpoints[i].y, as, bs, Bpoints[j].x, Bpoints[j].y)
   }
+  if (LitBpoints) {
+    bezier.beginHole()
+    for (let i = 0; i < 5; i++) {
+      let j = i + 1
+      if (j > 4) j = 0
+      let as = (LitBpoints[i].x + LitBpoints[j].x) * 1.5
+      let bs = (LitBpoints[i].y + LitBpoints[j].y) * 1.5
+      bezier.bezierCurveTo(
+        LitBpoints[i].x,
+        LitBpoints[i].y,
+        as,
+        bs,
+        LitBpoints[j].x,
+        LitBpoints[j].y
+      )
+    }
+    bezier.bezierCurveTo(
+      LitBpoints[0].x,
+      LitBpoints[0].y,
+      (LitBpoints[0].x + LitBpoints[1].x) * 1.5,
+      (LitBpoints[0].y + LitBpoints[1].y) * 1.5,
+      LitBpoints[1].x,
+      LitBpoints[1].y
+    )
 
-  bezier.beginHole()
-  for (let i = 0; i < 5; i++) {
-    let j = i + 1
-    if (j > 4) j = 0
-    let as = (LitBpoints[i].x + LitBpoints[j].x) * 1.5
-    let bs = (LitBpoints[i].y + LitBpoints[j].y) * 1.5
-    bezier.bezierCurveTo(LitBpoints[i].x, LitBpoints[i].y, as, bs, LitBpoints[j].x, LitBpoints[j].y)
+    bezier.endHole()
   }
-  bezier.bezierCurveTo(
-    LitBpoints[0].x,
-    LitBpoints[0].y,
-    (LitBpoints[0].x + LitBpoints[1].x) * 1.5,
-    (LitBpoints[0].y + LitBpoints[1].y) * 1.5,
-    LitBpoints[1].x,
-    LitBpoints[1].y
-  )
-
-  bezier.endHole()
 }
 // 生成五角星路径
 export const setStars = (R: number, r: number, x: number = 0, y: number = 0, ang: number = 0) => {
