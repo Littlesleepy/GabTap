@@ -502,7 +502,6 @@ export const Rfeather = (app: PIXI.Application) => {
     feather.x = -width / 2
     feather.y = -2 * height + height * 2 * n
     feather.scale.set(0.5 * radVNums())
-
     shape.addChild(feather)
     app.stage.addChild(shape)
 
@@ -520,14 +519,14 @@ export const Rfeather = (app: PIXI.Application) => {
           width: feather.width,
           height: feather.height,
           rotation: (Math.random() - 0.5) * 2 * Math.PI,
-          duration: 2000,
+          duration: 1000,
           easing: 'easeInOutQuad'
         })
         anime({
           targets: shape,
           alpha: 0,
           easing: 'easeInOutQuad',
-          delay: random(20, 60) * i + 800,
+          delay: random(10, 30) * i + 500,
           onComplete: function () {
             feather.removeChild()
             shape.clear()
@@ -538,8 +537,87 @@ export const Rfeather = (app: PIXI.Application) => {
     })
   }
 }
+let Rrotate = 0
+export const RsStars = (app: PIXI.Application) => {
+  const Color = getRandom()
+  const myArr = []
+  const containers: PIXI.Container = new PIXI.Container()
+  function riStars(R: number, num: number, isStars?: boolean, alpha?: number) {
+    const Bpoints = generatePolygonPoints(R, 5, 0, 0)
+    const LitBpoints = generatePolygonPoints(R * num, 5, 0, 0)
+    const bezier = new PIXI.Graphics()
+    bezier.beginFill(Color, 1)
+    bezier.lineStyle(0, Color, 1)
+    bezier.moveTo(Bpoints[0].x, Bpoints[0].y)
+    for (let i = 0; i < 5; i++) {
+      let j = i + 1
+      if (j > 4) j = 0
+      let as = (Bpoints[i].x + Bpoints[j].x) * 1.5
+      let bs = (Bpoints[i].y + Bpoints[j].y) * 1.5
+      bezier.bezierCurveTo(Bpoints[i].x, Bpoints[i].y, as, bs, Bpoints[j].x, Bpoints[j].y)
+    }
 
-// 生成五角星
+    if (isStars) {
+      bezier.beginHole()
+      for (let i = 0; i < 5; i++) {
+        let j = i + 1
+        if (j > 4) j = 0
+        let as = (LitBpoints[i].x + LitBpoints[j].x) * 1.5
+        let bs = (LitBpoints[i].y + LitBpoints[j].y) * 1.5
+        bezier.bezierCurveTo(
+          LitBpoints[i].x,
+          LitBpoints[i].y,
+          as,
+          bs,
+          LitBpoints[j].x,
+          LitBpoints[j].y
+        )
+      }
+      bezier.bezierCurveTo(
+        LitBpoints[0].x,
+        LitBpoints[0].y,
+        (LitBpoints[0].x + LitBpoints[1].x) * 1.5,
+        (LitBpoints[0].y + LitBpoints[1].y) * 1.5,
+        LitBpoints[1].x,
+        LitBpoints[1].y
+      )
+
+      bezier.endHole()
+    }
+
+    bezier.endFill()
+    if (alpha) {
+      bezier.alpha = alpha
+    }
+
+    containers.addChild(bezier)
+    myArr.push(bezier)
+  }
+  riStars(360 * radVNums(), 0.6, true)
+  riStars(400 * radVNums(), 0.95, true)
+  riStars(360 *1.175* radVNums(), 0.6, true, 0.2)
+  riStars(400*1.175 * radVNums(), 0.95, true, 0.2)
+  app.stage.addChild(containers)
+  containers.position.x = window.innerWidth / 2
+  containers.position.y = window.innerHeight / 2
+  containers.scale.set(0)
+  containers.rotation =Rrotate
+  Rrotate+=0.1
+  anime({
+    targets: containers.scale,
+    x: 5,
+    y: 5,
+    duration: 800,
+    easing: 'easeInQuart',
+    complete:  ()=> {
+      containers.removeAllListeners()
+      app.stage.removeChild(containers)
+    }
+  })
+
+}
+
+// 生成五角星路径
 export const setStars = (R: number, r: number, x: number = 0, y: number = 0, ang: number = 0) => {
   // 弧度
   const getAngle = (angle: number) => (Math.PI / 180) * angle

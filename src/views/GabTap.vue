@@ -9,7 +9,7 @@ import * as PIXI from 'pixi.js-legacy'
 import '@pixi/graphics-extras'
 import 'gsap'
 import 'pixi-sound'
-import { Rectangle, Rearrow, Rcircle, Rfeather } from '../hooks/animations'
+import { Rectangle, Rearrow, Rcircle, Rfeather,RsStars } from '../hooks/animations'
 import anime from 'animejs/lib/anime.es.js'
 import { getRandom } from '../hooks/color'
 import axios from 'axios'
@@ -159,8 +159,9 @@ export default defineComponent({
         // 动画
         // random(0, 1) < 0.5 ? Rectangle(app) : Rearrow(app)
         // Rcircle(app)
-        const funArr = [Rearrow, Rectangle, Rcircle, Rfeather]
+        const funArr = [Rearrow, Rectangle, Rcircle, Rfeather,RsStars]
         funArr[index % funArr.length](app)
+        // RsStars(app)
         // 音频播放
         ThrottleSound(index, time)
 
