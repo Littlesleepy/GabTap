@@ -9,14 +9,14 @@ import * as PIXI from 'pixi.js-legacy'
 import '@pixi/graphics-extras'
 import 'gsap'
 import 'pixi-sound'
-import { Rectangle, Rearrow, Rcircle, Rfeather,RsStars,RsDomStars } from '../hooks/animations'
+import { Rectangle, Rearrow, Rcircle, Rfeather, RsStars, RsDomStars } from '../hooks/animations'
 import anime from 'animejs/lib/anime.es.js'
 import { getRandom } from '../hooks/color'
 import axios from 'axios'
 import { audioList } from '../assets/audio'
 import { random } from '../hooks/random'
 import { generatePolygonPoints } from '../hooks/animations'
-import Gbm from '../assets/audio/audios/Gbm2.mp3'
+import Gbm from '../assets/audio/audios/Gbm3.mp3'
 import testPng from '../assets/images/test3.png'
 import { easing } from '../hooks/easing'
 export default defineComponent({
@@ -63,7 +63,6 @@ export default defineComponent({
     }
     onMounted(() => {
       initApp()
-      app.stage.addChild(background)
     })
     // 初始化
     let sprite: PIXI.Sprite
@@ -157,17 +156,15 @@ export default defineComponent({
         // 动画
         flashDraw(GabKeys[index])
         // 动画
-        // random(0, 1) < 0.5 ? Rectangle(app) : Rearrow(app)
-        // Rcircle(app)
+        // 背景动画播放
+        backgroundNumber()
         // 动画组
-        const funArr = [Rearrow, Rectangle,RsDomStars, Rcircle, Rfeather,RsStars]
+        const funArr = [Rearrow, Rectangle, RsDomStars, Rcircle, Rfeather, RsStars]
+        // 动画播放
         funArr[index % funArr.length](app)
         // RsDomStars(app)
         // 音频播放
         ThrottleSound(index, time)
-
-        // backgroundAnime()
-        backgroundNumber()
 
         // 避免移动事件重复判定
         reMove = index
@@ -177,7 +174,7 @@ export default defineComponent({
       if (playInit.value) return
 
       AutoFalsh = setInterval(() => {
-        flashDraw(GabKeys[Math.trunc(random(31, 0))])
+        // flashDraw(GabKeys[Math.trunc(random(31, 0))])
       }, 2000)
     }
 
@@ -188,16 +185,28 @@ export default defineComponent({
       }
     )
     let date = 0
-    // 简易节流
+    // 简易节流 音频
     function ThrottleSound(index: number, setTime: number) {
-      let timer = +new Date().getTime()
+      let timer = new Date().getTime()
       let retime = setTime - (timer - date)
       if (timer - date > setTime) {
         date = timer
         retime = setTime - (timer - date)
         GabSound(index)
+      } else {
+        reSound(index, retime)
       }
     }
+    let reSoundFlag = true
+    function reSound(index: number, setTime: number) {
+      if (!reSoundFlag) return
+      reSoundFlag = false
+      setTimeout(() => {
+        ThrottleSound(index, setTime)
+        reSoundFlag = true
+      }, setTime)
+    }
+
     // 背景计数器
     let BaNumber = 0
     let BaNumberMax = Math.trunc(random(22, 14))
@@ -210,13 +219,8 @@ export default defineComponent({
       }
     }
     // 背景颜色切换
-    let background = new PIXI.Graphics()
     const setBackgroundColor = () => {
-      background.clear()
-      background.beginFill(color || 961175)
-
-      background.drawRect(0, 0, window.innerWidth, window.innerHeight)
-      background.endFill()
+      app.renderer.backgroundColor = color || 961175
     }
 
     // 背景动画

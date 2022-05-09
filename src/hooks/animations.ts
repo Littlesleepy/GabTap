@@ -316,9 +316,8 @@ export const Rcircle = (app: PIXI.Application) => {
   const tsr = Math.sqrt(Math.pow(window.innerHeight, 2) + Math.pow(window.innerWidth, 2)) / 94
   const tr = Math.sqrt(Math.pow(window.innerHeight, 2) + Math.pow(window.innerWidth, 2)) / 3.5
 
-  const SR = tsr * ran
-  const LSR = SR / 2
-  const R = tr * ran
+  const SR = tsr * ran*0.6
+  const R = tr * ran*0.6
   const rectAndHole = new PIXI.Graphics()
   rectAndHole.beginFill(Color)
   rectAndHole.drawRect(0, 0, R, R)
@@ -343,7 +342,6 @@ export const Rcircle = (app: PIXI.Application) => {
       }
     }
   }
-  let myObject
   function Rcircle() {
     for (let i = 1; i <= nums; i++) {
       Arr[i] = []
@@ -642,7 +640,7 @@ export const RsDomStars = (app: PIXI.Application) => {
   }
 }
 
-// 生成贝塞尔五角星 数位板
+// 生成贝塞尔五角星 
 const bezierStars = (
   bezier: PIXI.Graphics,
   Bpoints: Array<PIXI.Point>,
