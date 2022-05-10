@@ -316,8 +316,8 @@ export const Rcircle = (app: PIXI.Application) => {
   const tsr = Math.sqrt(Math.pow(window.innerHeight, 2) + Math.pow(window.innerWidth, 2)) / 94
   const tr = Math.sqrt(Math.pow(window.innerHeight, 2) + Math.pow(window.innerWidth, 2)) / 3.5
 
-  const SR = tsr * ran*0.6
-  const R = tr * ran*0.6
+  const SR = tsr * ran * 0.6
+  const R = tr * ran * 0.6
   const rectAndHole = new PIXI.Graphics()
   rectAndHole.beginFill(Color)
   rectAndHole.drawRect(0, 0, R, R)
@@ -581,6 +581,98 @@ export const RsStars = (app: PIXI.Application) => {
     }
   })
 }
+// 光环
+export const Rhalo = (app: PIXI.Application) => {
+  const container: PIXI.Container = new PIXI.Container()
+  const Color = getRandom()
+  let direction = random(0, 1) > 0.5 ? true : false
+  let R = random(200, 350) * radVNums()
+  container.x = window.innerWidth / 2
+  container.y = window.innerHeight / 2
+  const circle = new PIXI.Graphics()
+  circle.lineStyle(R / 5, 0xf9f287, 1)
+  circle.beginFill(0x000000, 0)
+  circle.drawCircle(0, 0, R)
+  circle.endFill()
+  container.addChild(circle)
+  const Dcircle = new PIXI.Graphics()
+  Dcircle.lineStyle(R / 5, Color, 1)
+  Dcircle.beginFill(0x000000, 0)
+  Dcircle.drawCircle(0, 0, R)
+  Dcircle.endFill()
+  container.addChild(Dcircle)
+  // 遮罩层
+  let mask: PIXI.Graphics = new PIXI.Graphics()
+
+  container.addChild(mask)
+  app.stage.addChild(container)
+  container.scale.set(0)
+  container.rotation = random(0, Math.PI)
+  Dcircle.mask = mask
+  let startAngle = Math.PI
+  let maskParams: maskParams = {
+    _radius: R * 1.2,
+    startAngle: startAngle,
+    endAngle: startAngle
+  }
+
+  const bezierContainers: PIXI.Container = new PIXI.Container()
+  container.addChild(bezierContainers)
+  const Bpoints = generatePolygonPoints(R / 2, 5, 0, 0)
+  let bezier = new PIXI.Graphics()
+  anime({
+    targets: container.scale,
+    keyframes: [
+      { x: 1, y: 1, duration: 1600 },
+      { x: 0, y: getBoolean() ? 1 : 0, duration: 400, easing: 'easeInOutQuad' }
+    ],
+    complete: () => {
+      Dcircle.clear()
+      circle.clear()
+      mask.clear()
+      bezier.clear()
+      container.removeAllListeners()
+      bezierContainers.removeAllListeners()
+    }
+  })
+
+  anime({
+    targets: maskParams,
+    endAngle: startAngle + (direction ? 2 : -2) * Math.PI,
+    duration: 1600,
+    easing: 'easeInOutQuad',
+    update: () => {
+      bezierContainers.rotation = maskParams.endAngle
+      mask.clear()
+      mask.beginFill(0xffffff)
+      mask.moveTo(0, 0)
+      mask.arc(0, 0, maskParams._radius, maskParams.startAngle, maskParams.endAngle, direction)
+      bezier = new PIXI.Graphics()
+      bezier.beginFill(Color, 1)
+      bezier.lineStyle(0, Color, 1)
+      bezier.moveTo(Bpoints[0].x, Bpoints[0].y)
+      bezier.scale.set(0.1)
+      bezierStars(bezier, Bpoints)
+      bezier.endFill()
+      bezierContainers.addChild(bezier)
+      bezierContainers.pivot.x = -R
+      bezier.rotation = random(0, Math.PI * 2)
+      if (direction ? maskParams.endAngle < 9 : maskParams.endAngle > -2.7) {
+        anime({
+          targets: bezier,
+          x: getBoolean() ? random(0, R / 3) : -random(0, R / 3),
+          y: getBoolean() ? random(0, R / 3) : -random(0, R / 3),
+          alpha: 0,
+          duration: 600,
+          easing: 'easeInOutQuad'
+        })
+      } else {
+        bezier.alpha = 0
+      }
+    }
+  })
+}
+
 // 随机生成贝塞尔五角星
 export const RsDomStars = (app: PIXI.Application) => {
   for (let i = 0; i < random(6, 12); i++) {
@@ -640,7 +732,7 @@ export const RsDomStars = (app: PIXI.Application) => {
   }
 }
 
-// 生成贝塞尔五角星 
+// 生成贝塞尔五角星
 const bezierStars = (
   bezier: PIXI.Graphics,
   Bpoints: Array<PIXI.Point>,
@@ -703,6 +795,9 @@ export const setStars = (R: number, r: number, x: number = 0, y: number = 0, ang
   }
   getStarPath(R, r)
   return Bpoints
+}
+const getBoolean = () => {
+  return random(0, 1) < 0.5 ? true : false
 }
 
 // 生成随机多边形 3~9

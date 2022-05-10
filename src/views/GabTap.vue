@@ -9,7 +9,7 @@ import * as PIXI from 'pixi.js-legacy'
 import '@pixi/graphics-extras'
 import 'gsap'
 import 'pixi-sound'
-import { Rectangle, Rearrow, Rcircle, Rfeather, RsStars, RsDomStars } from '../hooks/animations'
+import { Rectangle, Rearrow, Rcircle, Rfeather, RsStars, RsDomStars,Rhalo } from '../hooks/animations'
 import anime from 'animejs/lib/anime.es.js'
 import { getRandom } from '../hooks/color'
 import axios from 'axios'
@@ -36,12 +36,10 @@ export default defineComponent({
       // Rectangle(app)
       // Rearrow(app)
     }
-    let AutoFalsh: any
     let playInit = ref(false)
     // 简易点击限制
-    let Click = false,
-      // 简易节流
-      ClickFlag = true,
+    // 简易节流
+    let ClickFlag = true,
       Ctime: any
     function throttle(time: number) {
       ClickFlag = false
@@ -83,10 +81,8 @@ export default defineComponent({
 
       initGabTap()
     }
-    let currentTarget = 0
 
     const initGabTap = () => {
-      clearInterval(AutoFalsh)
       // 横屏8
       // 竖屏4
       let row = 8,
@@ -161,8 +157,8 @@ export default defineComponent({
         // 动画组
         const funArr = [Rearrow, Rectangle, RsDomStars, Rcircle, Rfeather, RsStars]
         // 动画播放
-        funArr[index % funArr.length](app)
-        // RsDomStars(app)
+        // funArr[index % funArr.length](app)
+        Rhalo(app)
         // 音频播放
         ThrottleSound(index, time)
 
@@ -172,18 +168,8 @@ export default defineComponent({
       container.addChild(GabKeyPane)
       app.stage.addChild(container)
       if (playInit.value) return
-
-      AutoFalsh = setInterval(() => {
-        // flashDraw(GabKeys[Math.trunc(random(31, 0))])
-      }, 2000)
     }
 
-    watch(
-      () => playInit.value,
-      () => {
-        clearInterval(AutoFalsh)
-      }
-    )
     let date = 0
     // 简易节流 音频
     function ThrottleSound(index: number, setTime: number) {
@@ -325,8 +311,6 @@ export default defineComponent({
     }
 
     // 音频部分
-    // const sources: any[] = []
-
     const GabSound = (index: number) => {
       // 创建音频源头节点
       var ctx = new AudioContext()
@@ -361,18 +345,11 @@ export default defineComponent({
         gain.connect(analyser)
 
         analyser.connect(ctx.destination)
-        // push到数组方便在外面控制
-        // sources.push(source)
         // 可以对音频做任何控制 接收一个 n 从 n 开始播放 默认0
         source.start(0) //播放
-        // 内存有限 需要清除
+        // 清除
         source.onended = (e) => {
           ctx.close()
-          // // 第二个音频播放 移除第一个
-          // if (sources.length > 1) {
-          //   // sources[0].stop()
-          //   // sources.shift()
-          // }
         }
         let dataArray = new Uint8Array(analyser.frequencyBinCount)
         initHeader(dataArray, analyser)
@@ -383,7 +360,6 @@ export default defineComponent({
       let myObject = {
         scale: 0
       }
-
       sprite.on('pointerdown', (e: PIXI.InteractionEvent) => {})
       anime({
         targets: myObject,
@@ -404,7 +380,6 @@ export default defineComponent({
         }
         averageFrequencyData = sum / dataArray.length
         sprite.height = (500 + averageFrequencyData) * radNums()
-        // sprite.skew.x = averageFrequencyData / 439
       }
     }
 
@@ -421,7 +396,6 @@ export default defineComponent({
       let gain = ctx.createGain() //音量节点
       gain.gain.value = 0.5
       let analyser = ctx.createAnalyser()
-      // analyser.fftSize = 256;
       // 播放
       async function playAudio() {
         const audioBuffer = await loadAudio()
@@ -489,7 +463,6 @@ export default defineComponent({
             }
             averageFrequencyData = sum / dataArray.length
             sprite.skew.x = (averageFrequencyData / 539) * radNums()
-            // sprite.height = 500 + averageFrequencyData
           }
         }
         initHeader()
