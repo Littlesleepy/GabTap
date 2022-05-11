@@ -583,6 +583,8 @@ export const RsStars = (app: PIXI.Application) => {
 }
 // 光环
 export const Rhalo = (app: PIXI.Application) => {
+  // 是否加入星星特效
+  const stars = random(0, 100) < 3.14 ? true : false
   const container: PIXI.Container = new PIXI.Container()
   const Color = getRandom()
   let direction = random(0, 1) > 0.5 ? true : false
@@ -618,8 +620,6 @@ export const Rhalo = (app: PIXI.Application) => {
 
   const bezierContainers: PIXI.Container = new PIXI.Container()
   container.addChild(bezierContainers)
-  const Bpoints = generatePolygonPoints(R / 2, 5, 0, 0)
-  let bezier = new PIXI.Graphics()
   anime({
     targets: container.scale,
     keyframes: [
@@ -630,7 +630,7 @@ export const Rhalo = (app: PIXI.Application) => {
       Dcircle.clear()
       circle.clear()
       mask.clear()
-      bezier.clear()
+      // bezier.clear()
       container.removeAllListeners()
       bezierContainers.removeAllListeners()
     }
@@ -647,27 +647,30 @@ export const Rhalo = (app: PIXI.Application) => {
       mask.beginFill(0xffffff)
       mask.moveTo(0, 0)
       mask.arc(0, 0, maskParams._radius, maskParams.startAngle, maskParams.endAngle, direction)
-      bezier = new PIXI.Graphics()
-      bezier.beginFill(Color, 1)
-      bezier.lineStyle(0, Color, 1)
-      bezier.moveTo(Bpoints[0].x, Bpoints[0].y)
-      bezier.scale.set(0.1)
-      bezierStars(bezier, Bpoints)
-      bezier.endFill()
-      bezierContainers.addChild(bezier)
-      bezierContainers.pivot.x = -R
-      bezier.rotation = random(0, Math.PI * 2)
-      if (direction ? maskParams.endAngle < 9 : maskParams.endAngle > -2.7) {
+      if ((direction ? maskParams.endAngle < 9 : maskParams.endAngle > -2.7) && stars) {
+        const Bpoints = generatePolygonPoints(R*0.6, 5, 0, 0)
+        const bezier = new PIXI.Graphics()
+        bezier.beginFill(Color, 1)
+        bezier.lineStyle(0, Color, 1)
+        bezier.moveTo(Bpoints[0].x, Bpoints[0].y)
+        bezier.scale.set(0.1)
+        bezierStars(bezier, Bpoints)
+        bezier.endFill()
+        bezierContainers.addChild(bezier)
+        bezierContainers.pivot.x = -R
+        bezier.rotation = random(0, Math.PI * 2)
         anime({
           targets: bezier,
-          x: getBoolean() ? random(0, R / 3) : -random(0, R / 3),
-          y: getBoolean() ? random(0, R / 3) : -random(0, R / 3),
+          x: random(-R / 3, R / 3),
+          y: direction ? -R / 2 : R / 2,
           alpha: 0,
-          duration: 600,
-          easing: 'easeInOutQuad'
+          duration: 300,
+          easing: 'easeInOutQuad',
+          complete: () => {
+            bezier.clear()
+            bezier.removeChild()
+          }
         })
-      } else {
-        bezier.alpha = 0
       }
     }
   })

@@ -155,10 +155,10 @@ export default defineComponent({
         // 背景动画播放
         backgroundNumber()
         // 动画组
-        const funArr = [Rearrow, Rectangle, RsDomStars, Rcircle, Rfeather, RsStars]
+        const funArr = [Rearrow, Rectangle, RsDomStars, Rcircle, Rfeather, RsStars,Rhalo]
         // 动画播放
-        // funArr[index % funArr.length](app)
-        Rhalo(app)
+        funArr[index % funArr.length](app)
+        // Rhalo(app)
         // 音频播放
         ThrottleSound(index, time)
 
