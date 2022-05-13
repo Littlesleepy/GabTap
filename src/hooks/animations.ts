@@ -648,7 +648,7 @@ export const Rhalo = (app: PIXI.Application) => {
       mask.moveTo(0, 0)
       mask.arc(0, 0, maskParams._radius, maskParams.startAngle, maskParams.endAngle, direction)
       if ((direction ? maskParams.endAngle < 9 : maskParams.endAngle > -2.7) && stars) {
-        const Bpoints = generatePolygonPoints(R*0.6, 5, 0, 0)
+        const Bpoints = generatePolygonPoints(R * 0.6, 5, 0, 0)
         const bezier = new PIXI.Graphics()
         bezier.beginFill(Color, 1)
         bezier.lineStyle(0, Color, 1)
@@ -674,6 +674,54 @@ export const Rhalo = (app: PIXI.Application) => {
       }
     }
   })
+}
+
+export const anm = (app: PIXI.Application) => {
+  let anmx = window.innerWidth
+  let anmf = true
+  let text = anmf ? '一' : '几'
+  const time = random(200, 400)
+  const color = getRandom()
+  const Size = 100 * radVNums()
+  const richTextY = random(100, window.innerHeight)
+  const style = new PIXI.TextStyle({
+    fontFamily: 'Arial',
+    fontSize: Size,
+    // fontStyle: 'italic',
+    fontWeight: 'bold',
+    fill: [color], // gradient
+    stroke: '#4a1850',
+    strokeThickness: 0,
+    dropShadow: false,
+    dropShadowColor: '#000000',
+    dropShadowBlur: 5,
+    dropShadowAngle: Math.PI / 6,
+    dropShadowDistance: 6,
+    wordWrap: true,
+    wordWrapWidth: 440,
+    lineJoin: 'round'
+  })
+
+  const richText = new PIXI.Text(text, style)
+  richText.x = anmx
+  richText.y = anmf ? 230 : 200
+
+  app.stage.addChild(richText)
+  ;(function reSet() {
+    richText.x = anmx
+    richText.y = richTextY - (anmf ? Size : Size * 1.3)
+    richText.text = anmf ? '一' : '几'
+
+    anmx -= Size * radVNums()
+    if (anmx > -Size) {
+      setTimeout(() => {
+        anmf = !anmf
+        reSet()
+      }, time)
+    } else {
+      app.stage.removeChild(richText)
+    }
+  })()
 }
 
 // 随机生成贝塞尔五角星
@@ -736,7 +784,7 @@ export const RsDomStars = (app: PIXI.Application) => {
 }
 
 // 生成贝塞尔五角星
-const bezierStars = (
+export const bezierStars = (
   bezier: PIXI.Graphics,
   Bpoints: Array<PIXI.Point>,
   LitBpoints?: Array<PIXI.Point>

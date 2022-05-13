@@ -7,10 +7,13 @@
     v-show="Gabinit ? Gabinit.playInit : false"
     >FEEDBACK : {{ FEEDBACK ? 'ON' : 'OFF' }}</a
   >
+  <a class="BGM" href="javascript:;" @click="BGM_Ck" v-show="Gabinit ? Gabinit.playInit : false"
+    >BGM : {{ BGM ? 'ON' : 'OFF' }}</a
+  >
 
   <Home @init="init"></Home>
 
-  <GabTap ref="Gabinit" :FEEDBACK="FEEDBACK"></GabTap>
+  <GabTap ref="Gabinit" :FEEDBACK="FEEDBACK" :BGM="BGM"></GabTap>
 </template>
 <script lang="ts">
 import { defineComponent, ref } from 'vue'
@@ -25,8 +28,9 @@ export default defineComponent({
   },
   setup() {
     let flag = false
-    let Gabinit = ref<any>()
-    let FEEDBACK = ref(true)
+    const Gabinit = ref<any>()
+    const FEEDBACK = ref(true)
+    const BGM = ref(true)
     const ck = () => {
       if (!flag) {
         document.body.requestFullscreen()
@@ -43,7 +47,10 @@ export default defineComponent({
     const FEEDBACK_Ck = () => {
       FEEDBACK.value = !FEEDBACK.value
     }
-    return { ck, init, Gabinit, FEEDBACK, FEEDBACK_Ck }
+    const BGM_Ck = () => {
+      BGM.value = !BGM.value
+    }
+    return { ck, init, Gabinit, FEEDBACK, FEEDBACK_Ck, BGM_Ck, BGM }
   }
 })
 </script>
@@ -88,6 +95,19 @@ canvas {
   border-bottom: 2px rgb(249, 242, 135) dashed;
   top: 2vh;
   left: 50%;
+  transform: translateX(-50%);
+  font-size: 18px;
+  padding-bottom: 2px;
+}
+.BGM {
+  font-family: fontFamilyName;
+  z-index: 1000;
+  position: absolute;
+  color: rgb(249, 242, 135);
+  text-decoration: none;
+  border-bottom: 2px rgb(249, 242, 135) dashed;
+  top: 2vh;
+  left: 60%;
   transform: translateX(-50%);
   font-size: 18px;
   padding-bottom: 2px;

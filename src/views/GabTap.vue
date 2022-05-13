@@ -9,13 +9,22 @@ import * as PIXI from 'pixi.js-legacy'
 import '@pixi/graphics-extras'
 import 'gsap'
 import 'pixi-sound'
-import { Rectangle, Rearrow, Rcircle, Rfeather, RsStars, RsDomStars,Rhalo } from '../hooks/animations'
+import {
+  Rectangle,
+  Rearrow,
+  Rcircle,
+  Rfeather,
+  RsStars,
+  RsDomStars,
+  Rhalo,
+  anm
+} from '../hooks/animations'
 import anime from 'animejs/lib/anime.es.js'
 import { getRandom } from '../hooks/color'
 import axios from 'axios'
 import { audioList } from '../assets/audio'
 import { random } from '../hooks/random'
-import { generatePolygonPoints } from '../hooks/animations'
+import { generatePolygonPoints, bezierStars } from '../hooks/animations'
 import Gbm from '../assets/audio/audios/Gbm3.mp3'
 import testPng from '../assets/images/test3.png'
 import { easing } from '../hooks/easing'
@@ -25,9 +34,13 @@ export default defineComponent({
     FEEDBACK: {
       type: Boolean,
       required: true
+    },
+    BGM: {
+      type: Boolean,
+      required: true
     }
   },
-  setup(props: any) {
+  setup(props) {
     // canvas 舞台
     let app: PIXI.Application
     const childClick = () => {
@@ -155,9 +168,10 @@ export default defineComponent({
         // 背景动画播放
         backgroundNumber()
         // 动画组
-        const funArr = [Rearrow, Rectangle, RsDomStars, Rcircle, Rfeather, RsStars,Rhalo]
+        const funArr = [Rearrow, Rectangle, RsDomStars, Rcircle, Rfeather, RsStars, Rhalo, anm]
         // 动画播放
         funArr[index % funArr.length](app)
+        // backgroundAnime2()
         // Rhalo(app)
         // 音频播放
         ThrottleSound(index, time)
@@ -213,9 +227,10 @@ export default defineComponent({
     let color: number = 0
     let reColor = -1
     const backgroundAnimeArr: PIXI.Container[] = []
+
     const backgroundAnime = () => {
       // 精灵组
-      let container: PIXI.Container = new PIXI.Container()
+      const container: PIXI.Container = new PIXI.Container()
       let pane: PIXI.Graphics = new PIXI.Graphics()
       pane.beginFill(0, 0)
       pane.drawRect(0, 0, window.innerWidth, window.innerHeight)
@@ -309,6 +324,12 @@ export default defineComponent({
         mask.endFill()
       }
     }
+    const backgroundAnime2 = () => {
+      // 
+      const Color = getRandom()
+      const BX = window.innerWidth / 4
+      const BY = window.innerHeight / 4
+    }
 
     // 音频部分
     const GabSound = (index: number) => {
@@ -388,7 +409,7 @@ export default defineComponent({
     function radNums() {
       return Math.sqrt(Math.pow(window.innerHeight, 2) + Math.pow(window.innerWidth, 2)) / 2136
     }
-    const PlayBgm = (bgm: any) => {
+    const PlayBgm = () => {
       if (!flag) return
       flag = false
       let ctx = new AudioContext()
@@ -414,6 +435,15 @@ export default defineComponent({
       }
       // 连接节点
       async function playSound(audioBuffer: AudioBuffer) {
+        watch(
+          () => props.BGM,
+          (nv) => {
+            gain.gain.value = nv ? 0.5 : 0
+            source.connect(gain)
+            gain.connect(analyser)
+            analyser.connect(ctx.destination)
+          }
+        )
         source.buffer = audioBuffer
         source.loop = true
         source.connect(gain)
