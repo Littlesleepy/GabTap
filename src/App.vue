@@ -1,15 +1,17 @@
 <template>
   <div class="O" @click="ck">□</div>
-  <a
-    class="FEEDBACK"
-    href="javascript:;"
-    @click="FEEDBACK_Ck"
-    v-show="Gabinit ? Gabinit.playInit : false"
-    >FEEDBACK : {{ FEEDBACK ? 'ON' : 'OFF' }}</a
-  >
-  <a class="BGM" href="javascript:;" @click="BGM_Ck" v-show="Gabinit ? Gabinit.playInit : false"
-    >BGM : {{ BGM ? 'ON' : 'OFF' }}</a
-  >
+  <div class="LIST">
+    <a
+      class="FEEDBACK"
+      href="javascript:;"
+      @click="FEEDBACK_Ck"
+      v-show="Gabinit ? Gabinit.playInit : false"
+      >FEEDBACK : {{ FEEDBACK ? 'ON' : 'OFF' }}</a
+    >
+    <a class="BGM" href="javascript:;" @click="BGM_Ck" v-show="Gabinit ? Gabinit.playInit : false"
+      >BGM : {{ BGM ? 'ON' : 'OFF' }}</a
+    >
+  </div>
 
   <Home @init="init"></Home>
 
@@ -86,32 +88,38 @@ canvas {
   // background-color: rgb(245, 161, 202);
   background-color: rgb(0, 180, 163);
 }
-.FEEDBACK {
-  font-family: fontFamilyName;
-  z-index: 1000;
-  position: absolute;
-  color: rgb(249, 242, 135);
-  text-decoration: none;
-  border-bottom: 2px rgb(249, 242, 135) dashed;
-  top: 2vh;
-  left: 50%;
-  transform: translateX(-50%);
-  font-size: 18px;
-  padding-bottom: 2px;
+.LIST {
+  display: flex;
+  width: 100%;
+  justify-content: flex-start;
+  padding: 10px;
+  padding-left: 40%;
+
+  a {
+    margin: 0 10px;
+  }
+  .FEEDBACK {
+    font-family: fontFamilyName;
+    z-index: 1000;
+    color: rgb(249, 242, 135);
+    text-decoration: none;
+    border-bottom: 2px rgb(249, 242, 135) dashed;
+    top: 2vh;
+    font-size: 18px;
+    padding-bottom: 2px;
+  }
+  .BGM {
+    font-family: fontFamilyName;
+    z-index: 1000;
+    color: rgb(249, 242, 135);
+    text-decoration: none;
+    border-bottom: 2px rgb(249, 242, 135) dashed;
+    top: 2vh;
+    font-size: 18px;
+    padding-bottom: 2px;
+  }
 }
-.BGM {
-  font-family: fontFamilyName;
-  z-index: 1000;
-  position: absolute;
-  color: rgb(249, 242, 135);
-  text-decoration: none;
-  border-bottom: 2px rgb(249, 242, 135) dashed;
-  top: 2vh;
-  left: 60%;
-  transform: translateX(-50%);
-  font-size: 18px;
-  padding-bottom: 2px;
-}
+
 .O {
   width: 6vh;
   height: 6vh;

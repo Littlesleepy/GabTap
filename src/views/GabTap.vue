@@ -69,7 +69,6 @@ export default defineComponent({
       app.renderer.resize(document.body.offsetWidth, document.body.offsetHeight)
       sprite.x = window.innerWidth - 250 * radNums()
       sprite.y = window.innerHeight
-
       sprite.scale.set(radNums())
     }
     onMounted(() => {
@@ -220,7 +219,7 @@ export default defineComponent({
     }
     // 背景颜色切换
     const setBackgroundColor = () => {
-      app.renderer.backgroundColor = color || 961175
+      app.renderer.backgroundColor = color ?? 961175
     }
 
     // 背景动画
@@ -325,7 +324,7 @@ export default defineComponent({
       }
     }
     const backgroundAnime2 = () => {
-      // 
+      //
       const Color = getRandom()
       const BX = window.innerWidth / 4
       const BY = window.innerHeight / 4
