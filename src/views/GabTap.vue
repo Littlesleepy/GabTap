@@ -24,7 +24,7 @@ import { getRandom } from '../hooks/color'
 import axios from 'axios'
 import { audioList } from '../assets/audio'
 import { random } from '../hooks/random'
-import { generatePolygonPoints, bezierStars } from '../hooks/animations'
+import { generatePolygonPoints, bezierStars, radVNums } from '../hooks/animations'
 import Gbm from '../assets/audio/audios/Gbm3.mp3'
 import testPng from '../assets/images/test3.png'
 import { easing } from '../hooks/easing'
@@ -166,11 +166,12 @@ export default defineComponent({
         // 动画
         // 背景动画播放
         backgroundNumber()
+        // backgroundAnime2()
+
         // 动画组
         const funArr = [Rearrow, Rectangle, RsDomStars, Rcircle, Rfeather, RsStars, Rhalo, anm]
         // 动画播放
         funArr[index % funArr.length](app)
-        // backgroundAnime2()
         // Rhalo(app)
         // 音频播放
         ThrottleSound(index, time)
@@ -208,13 +209,21 @@ export default defineComponent({
 
     // 背景计数器
     let BaNumber = 0
-    let BaNumberMax = Math.trunc(random(22, 14))
+    let BaNumberMax = Math.trunc(random(14, 22))
     let backgroundNumber = () => {
       BaNumber++
       if (BaNumber >= BaNumberMax) {
-        backgroundAnime()
+        ;(function setColor() {
+          color = getRandom()
+          if (color == reColor) {
+            setColor()
+          }
+        })()
+        // setColor()
+        random(0, 1) < 0.5 ? backgroundAnime2() : backgroundAnime()
+
         BaNumber = 0
-        BaNumberMax = Math.trunc(random(22, 14))
+        BaNumberMax = Math.trunc(random(14, 22))
       }
     }
     // 背景颜色切换
@@ -223,10 +232,10 @@ export default defineComponent({
     }
 
     // 背景动画
-    let color: number = 0
+    let color: number = 0x0eaa97
     let reColor = -1
     const backgroundAnimeArr: PIXI.Container[] = []
-
+    // 背景动画1
     const backgroundAnime = () => {
       // 精灵组
       const container: PIXI.Container = new PIXI.Container()
@@ -235,14 +244,7 @@ export default defineComponent({
       pane.drawRect(0, 0, window.innerWidth, window.innerHeight)
       // 遮罩层
       let mask: PIXI.Graphics = new PIXI.Graphics()
-      // 设置颜色 防止和上一次相同
-      function setColor() {
-        color = getRandom()
-        if (color == reColor) {
-          setColor()
-        }
-      }
-      setColor()
+
       reColor = color
       // 多边形
       let polygon: PIXI.Graphics = new PIXI.Graphics()
@@ -308,6 +310,7 @@ export default defineComponent({
               if (backgroundAnimeArr.length > 1) {
                 backgroundAnimeArr[0].removeAllListeners()
                 app.stage.removeChild(backgroundAnimeArr[0])
+                backgroundAnimeArr.shift()
               }
             })
             if (i == 1) setBackgroundColor()
@@ -323,12 +326,45 @@ export default defineComponent({
         mask.endFill()
       }
     }
+    // 背景动画2
     const backgroundAnime2 = () => {
-      //
-      const Color = getRandom()
-      const BX = window.innerWidth / 4
-      const BY = window.innerHeight / 4
+      const { stage } = app
+      reColor = color
+      const Bpoints = generatePolygonPoints(400 * radVNums(), 5, 0, 0)
+      const myObject = {
+        LR: 350
+      }
+      let brush = new PIXI.Graphics()
+      brush.x = window.innerWidth / 2
+      brush.y = window.innerHeight / 2
+      brush.scale.set(3)
+      stage.addChild(brush)
+      backgroundAnimeArr.push(brush)
+      anime({
+        targets: myObject,
+        LR: 0,
+        duration: 800,
+        easing: 'linear',
+        update: () => {
+          brush.beginFill(color)
+          brush.moveTo(Bpoints[0].x, Bpoints[0].y)
+          bezierStars(brush, Bpoints, generatePolygonPoints(myObject.LR * radVNums(), 5, 0, 0))
+          brush.endFill()
+        },
+        complete: () => {
+          nextTick(() => {
+            if (backgroundAnimeArr.length > 1) {
+              backgroundAnimeArr[0].removeAllListeners()
+              stage.removeChild(backgroundAnimeArr[0])
+              backgroundAnimeArr.shift()
+            }
+          })
+          setBackgroundColor()
+        }
+      })
     }
+
+    const backgroundAnime3 = () => {}
 
     // 音频部分
     const GabSound = (index: number) => {

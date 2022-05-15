@@ -868,6 +868,6 @@ export function generatePolygonPoints(
   return points
 }
 // 视口对角线 标准为1080*1920 (1)
-function radVNums(): number {
+export function radVNums(): number {
   return Math.sqrt(Math.pow(window.innerHeight, 2) + Math.pow(window.innerWidth, 2)) / 2136
 }
