@@ -17,7 +17,8 @@ import {
   RsStars,
   RsDomStars,
   Rhalo,
-  anm
+  anm,
+  Rline
 } from '../hooks/animations'
 import anime from 'animejs/lib/anime.es.js'
 import { getRandom } from '../hooks/color'
@@ -169,7 +170,7 @@ export default defineComponent({
         // backgroundAnime2()
 
         // 动画组
-        const funArr = [Rearrow, Rectangle, RsDomStars, Rcircle, Rfeather, RsStars, Rhalo, anm]
+        const funArr = [Rearrow, Rectangle, RsDomStars, Rcircle, Rfeather, RsStars, Rhalo, anm, Rline]
         // 动画播放
         funArr[index % funArr.length](app)
         // Rhalo(app)

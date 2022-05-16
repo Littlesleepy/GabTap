@@ -782,6 +782,48 @@ export const RsDomStars = (app: PIXI.Application) => {
     })
   }
 }
+// 网
+export const Rline = (app: PIXI.Application) => {
+  const Color = getRandom()
+  for (let i = 0; i < random(2, 16); i++) {
+    const flag = getBoolean()
+    const x = flag ? random(0, window.innerWidth / 2) - 40 : -40
+    const y = flag ? -40 : random(0, window.innerHeight / 2) - 40
+    const Tx = flag ? random(0, window.innerWidth / 2) + 40 : window.innerWidth + 40
+    const Ty = flag ? window.innerHeight + 40 : random(0, window.innerHeight) / 2 + 40
+    let line = new PIXI.Graphics()
+    line.lineStyle(random(4, 12), Color, 1)
+    line.moveTo(x, y)
+    line.lineTo(Tx, Ty)
+    line.alpha = 0
+    app.stage.addChild(line)
+    anime({
+      targets: line.scale,
+      keyframes: [
+        { x: 2, y: 2, duration: 1200, delay: 25 * i },
+        { x: 1, y: 1, duration: 600, easing: 'easeInOutQuad' }
+      ]
+    })
+    anime({
+      targets: line,
+      keyframes: [
+        {
+          alpha: 1,
+          duration: 1200,
+          delay: 25 * i
+        },
+        {
+          alpha: 0,
+          duration: 600,
+          easing: 'easeInOutQuad'
+        }
+      ],
+      complete: () => {
+        app.stage.removeChild(line)
+      }
+    })
+  }
+}
 
 // 生成贝塞尔五角星
 export const bezierStars = (
@@ -847,6 +889,7 @@ export const setStars = (R: number, r: number, x: number = 0, y: number = 0, ang
   getStarPath(R, r)
   return Bpoints
 }
+// true/false
 const getBoolean = () => {
   return random(0, 1) < 0.5 ? true : false
 }
