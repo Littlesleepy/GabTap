@@ -27,7 +27,7 @@ import { audioList } from '../assets/audio'
 import { random } from '../hooks/random'
 import { generatePolygonPoints, bezierStars, radVNums } from '../hooks/animations'
 import Gbm from '../assets/audio/audios/Gbm3.mp3'
-import testPng from '../assets/images/test3.png'
+import testPng from '../assets/images/test.png'
 import { easing } from '../hooks/easing'
 export default defineComponent({
   name: 'GabTap',
@@ -41,7 +41,7 @@ export default defineComponent({
       required: true
     }
   },
-  setup(props) {
+  setup(props, { emit }) {
     // canvas 舞台
     let app: PIXI.Application
     const childClick = () => {
@@ -118,15 +118,21 @@ export default defineComponent({
       let tesFlag = false
       // 点击事件
       GabKeyPane.on('pointerdown', (e: PIXI.InteractionEvent) => {
+        if (document.readyState !== 'complete') return
         tesFlag = true
         SetDraw(e, true, 185)
       }) //移动事件 tesFlag 只有在点击时可以触发移动事件
         .on('pointermove', (e: PIXI.InteractionEvent) => {
+          if (document.readyState !== 'complete') return
           if (!tesFlag) return
           SetDraw(e, false, 160)
         }) //离开事件
         .on('pointerup', () => {
+          if (document.readyState !== 'complete') return
           tesFlag = false
+          setTimeout(() => {
+            emit('listisshow', true)
+          }, 20)
         })
       // 循环生成方块
       for (let r = 0; r < col; r++) {
@@ -154,6 +160,7 @@ export default defineComponent({
       }
       // 位置判定
       function SetDraw(e: PIXI.InteractionEvent, flag: boolean, time: number) {
+        emit('listisshow', false)
         let position = e.data.global,
           x = Math.floor(position.x / (window.innerWidth / row)),
           y = Math.floor(position.y / (window.innerHeight / col)),
@@ -170,7 +177,17 @@ export default defineComponent({
         // backgroundAnime2()
 
         // 动画组
-        const funArr = [Rearrow, Rectangle, RsDomStars, Rcircle, Rfeather, RsStars, Rhalo, anm, Rline]
+        const funArr = [
+          Rearrow,
+          Rectangle,
+          RsDomStars,
+          Rcircle,
+          Rfeather,
+          RsStars,
+          Rhalo,
+          anm,
+          Rline
+        ]
         // 动画播放
         funArr[index % funArr.length](app)
         // Rhalo(app)

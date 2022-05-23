@@ -4,8 +4,8 @@
       <div class="header">
         <span><span class="G">G</span>abTap</span>
       </div>
-      <div class="center">
-        <div ref="Play" :class="PlayActive" @click.stop="clk">
+      <div class="center" >
+        <div ref="Play" :class="PlayActive" @click.stop="clk" v-show="load">
           <div ref="logo" class="logo">
             <img class="logo" src="../assets/images/GT1.png" alt="" />
           </div>
@@ -13,14 +13,8 @@
             <ul>
               <li>关于</li>
               <li>参考 : <a href="https://aidn.jp/mikutap/">Mikutap</a></li>
-              <li>
-                音频 :
-                <a
-                  href="https://zh.wikipedia.org/wiki/%E5%BB%A2%E5%A4%A9%E4%BD%BF%E5%8A%A0%E7%99%BE%E5%88%97"
-                  >《珈百璃的堕落》</a
-                >
-              </li>
-              <li>图片 : 占位文本</li>
+              <li>占位文本</li>
+              <li>占位文本</li>
             </ul>
           </div>
         </div>
@@ -47,21 +41,26 @@ export default defineComponent({
     let logo = ref()
     let aboutText = ref()
     let clickFlag = ref(true)
-
+    const load = ref(false)
+    window.onload = function () {
+      load.value = true
+    }
     const clk = () => {
       if (!clickFlag.value) return
-      anime({
-        targets: Play.value,
-        scale: 0,
-        duration: 300,
-        easing: 'linear',
-        complete: () => {
-          setTimeout(() => {
-            Flag.value = false
-            emit('init')
-          }, 200)
-        }
-      })
+      if (document.readyState == 'complete') {
+        anime({
+          targets: Play.value,
+          scale: 0,
+          duration: 300,
+          easing: 'linear',
+          complete: () => {
+            setTimeout(() => {
+              Flag.value = false
+              emit('init')
+            }, 200)
+          }
+        })
+      }
     }
     let PlayActive = ref<string>('Play PlayActive')
     watch(clickFlag, (newValue) => {
@@ -96,7 +95,7 @@ export default defineComponent({
     const about = () => {
       clickFlag.value = !clickFlag.value
     }
-    return { clk, Flag, about, logo, aboutText, Play, clickFlag, PlayActive }
+    return { clk, Flag, about, logo, aboutText, Play, clickFlag, PlayActive, load }
   }
 })
 </script>

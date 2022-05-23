@@ -10,6 +10,7 @@ import GM1PNG from '../assets/images/GM02.png'
 import Feathers from '../assets/images/feather3.png'
 import anime from 'animejs/lib/anime.es.js'
 import { nextTick } from 'vue'
+
 // 多边形
 export const Rectangle = (app: PIXI.Application) => {
   // 图形
@@ -63,7 +64,7 @@ export const Rectangle = (app: PIXI.Application) => {
   polygon.position.y = Y
   pol.position.x = X
   pol.position.y = Y
-
+  if(!GM1PNG)return
   let sprite: PIXI.Sprite = PIXI.Sprite.from(GM1PNG)
   sprite.anchor.set(0.5, 0.5)
   sprite.position.x = X
@@ -82,7 +83,7 @@ export const Rectangle = (app: PIXI.Application) => {
   pol.closePath()
   setTimeout(() => {
     pol.mask = sprite
-  }, 10)
+  }, 17)
   // 旋转
   polygon.rotation = rotation
   pol.rotation = rotation
@@ -483,7 +484,7 @@ export const Rcircle = (app: PIXI.Application) => {
     })
   })
 }
-
+// 羽毛
 export const Rfeather = (app: PIXI.Application) => {
   let seed = Math.floor(Math.random() * 3) + 13
   let nums = seed
@@ -676,6 +677,7 @@ export const Rhalo = (app: PIXI.Application) => {
   })
 }
 
+// 一几
 export const anm = (app: PIXI.Application) => {
   let anmx = window.innerWidth
   let anmf = true
@@ -785,12 +787,12 @@ export const RsDomStars = (app: PIXI.Application) => {
 // 网
 export const Rline = (app: PIXI.Application) => {
   const Color = getRandom()
-  for (let i = 0; i < random(2, 16); i++) {
+  for (let i = 0; i < random(2, 12); i++) {
     const flag = getBoolean()
-    const x = flag ? random(0, window.innerWidth / 2) - 40 : -40
-    const y = flag ? -40 : random(0, window.innerHeight / 2) - 40
-    const Tx = flag ? random(0, window.innerWidth / 2) + 40 : window.innerWidth + 40
-    const Ty = flag ? window.innerHeight + 40 : random(0, window.innerHeight) / 2 + 40
+    const x = flag ? random(0, window.innerWidth / 2) - 16 : -16
+    const y = flag ? -16 : random(0, window.innerHeight / 2) - 16
+    const Tx = flag ? random(0, window.innerWidth / 2) + 16 : window.innerWidth + 16
+    const Ty = flag ? window.innerHeight + 16 : random(0, window.innerHeight / 2) + 16
     let line = new PIXI.Graphics()
     line.lineStyle(random(4, 12), Color, 1)
     line.moveTo(x, y)
@@ -825,6 +827,7 @@ export const Rline = (app: PIXI.Application) => {
   }
 }
 
+// 非动画
 // 生成贝塞尔五角星
 export const bezierStars = (
   bezier: PIXI.Graphics,

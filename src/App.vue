@@ -1,6 +1,6 @@
 <template>
   <div class="O" @click="ck">□</div>
-  <div class="LIST">
+  <div class="LIST" v-show="LISTSHOW">
     <a
       class="FEEDBACK"
       href="javascript:;"
@@ -15,7 +15,7 @@
 
   <Home @init="init"></Home>
 
-  <GabTap ref="Gabinit" :FEEDBACK="FEEDBACK" :BGM="BGM"></GabTap>
+  <GabTap ref="Gabinit" :FEEDBACK="FEEDBACK" :BGM="BGM" @listisshow="listisshow"></GabTap>
 </template>
 <script lang="ts">
 import { defineComponent, ref } from 'vue'
@@ -33,6 +33,7 @@ export default defineComponent({
     const Gabinit = ref<any>()
     const FEEDBACK = ref(true)
     const BGM = ref(true)
+    const LISTSHOW = ref(true)
     const ck = () => {
       if (!flag) {
         document.body.requestFullscreen()
@@ -46,13 +47,16 @@ export default defineComponent({
       Gabinit.value.playInit = true
       Gabinit.value.PlayBgm()
     }
+    const listisshow = (f: boolean) => {
+      LISTSHOW.value = f
+    }
     const FEEDBACK_Ck = () => {
       FEEDBACK.value = !FEEDBACK.value
     }
     const BGM_Ck = () => {
       BGM.value = !BGM.value
     }
-    return { ck, init, Gabinit, FEEDBACK, FEEDBACK_Ck, BGM_Ck, BGM }
+    return { ck, init, Gabinit, FEEDBACK, FEEDBACK_Ck, BGM_Ck, BGM, LISTSHOW, listisshow }
   }
 })
 </script>
